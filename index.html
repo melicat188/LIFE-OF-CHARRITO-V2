@@ -67,18 +67,53 @@
         </p>
     </section>
 
-    <!-- La sección permanece fija dentro de este contenedor. -->
+    <section>
+        <h1>Apuestas las dos gemas de Charrito</h1>
+    </section>
+
+    <!-- PRIMERA RULETA -->
     <div class="tramo-pausa">
         <section class="seccion-fija">
             <h1>GIRA LA RULETA</h1>
 
             <p>Arrastra la ruleta con el dedo para girarla.</p>
 
-            <div id="ruleta">
+            <div class="ruleta">
                 <img
-                    id="imagen-ruleta"
+                    class="imagen-ruleta"
                     src="assets/ruleta.png"
-                    alt="Ruleta. También puedes girarla con las flechas del teclado."
+                    alt="Primera ruleta. Puedes girarla con las flechas del teclado."
+                    tabindex="0"
+                    draggable="false"
+                >
+            </div>
+
+            <p class="indicacion-scroll">
+                Desliza fuera de la ruleta para continuar ↓
+            </p>
+        </section>
+    </div>
+
+    <section>
+        <h1>Pierdes las dos gemas de Charrito</h1>
+
+        <p>Pero él realmente necesita las gemas...</p>
+
+        <p>Apuestas la última gema.</p>
+    </section>
+
+    <!-- SEGUNDA RULETA -->
+    <div class="tramo-pausa">
+        <section class="seccion-fija">
+            <h1>UNA ÚLTIMA OPORTUNIDAD</h1>
+
+            <p>Gira la ruleta con la última gema de Charrito.</p>
+
+            <div class="ruleta">
+                <img
+                    class="imagen-ruleta"
+                    src="assets/ruleta.png"
+                    alt="Segunda ruleta. Puedes girarla con las flechas del teclado."
                     tabindex="0"
                     draggable="false"
                 >
