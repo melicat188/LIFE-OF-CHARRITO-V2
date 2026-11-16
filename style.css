@@ -10,6 +10,7 @@ html {
 
 body {
     margin: 0;
+    padding: 0;
     background-color: black;
     color: white;
     font-family: Arial, sans-serif;
@@ -30,7 +31,7 @@ section {
     padding: 30px 20px;
 }
 
-/* TEXTOS */
+/* TÍTULOS */
 
 h1 {
     max-width: 100%;
@@ -38,6 +39,8 @@ h1 {
     font-size: clamp(32px, 8vw, 60px);
     overflow-wrap: break-word;
 }
+
+/* PÁRRAFOS */
 
 p {
     max-width: 600px;
@@ -54,6 +57,7 @@ p {
     max-width: 600px;
     height: 350px;
     margin-top: 30px;
+
     border-radius: 20px;
     overflow: hidden;
     background-color: #222;
@@ -82,10 +86,12 @@ p {
 
 .contenedor-verdes img {
     display: block;
+
     width: calc((100% - 40px) / 3);
     max-width: 200px;
     height: auto;
     aspect-ratio: 1;
+
     object-fit: contain;
     transition: transform 0.3s ease;
 }
@@ -96,12 +102,14 @@ p {
     }
 }
 
-/* SECCIÓN FIJA */
+/* SECCIONES FIJAS DURANTE EL SCROLL */
 
 /*
-   Aumenta 220 a 300 en ambas líneas para que
-   la sección permanezca fija durante más recorrido.
+   Aumenta 220 a 300 en ambas líneas
+   para que la sección permanezca fija más tiempo
+   mientras deslizas.
 */
+
 .tramo-pausa {
     height: 220vh;
     height: 220svh;
@@ -137,35 +145,45 @@ p {
     line-height: 1.4;
 }
 
-/* RULETA */
+/* TAMAÑO DE LAS DOS RULETAS */
 
-#ruleta {
-    width: min(400px, 75vw, 42vh);
-    width: min(400px, 75vw, 42svh);
+.ruleta {
+    /* Primera línea: respaldo para navegadores antiguos. */
+    width: 280px;
+    width: min(280px, 70vw, 40svh);
+
     max-width: 100%;
+    height: auto;
     aspect-ratio: 1;
-    flex-shrink: 0;
 
+    /* Evita que el contenedor cambie de tamaño. */
+    flex: 0 0 auto;
+
+    /* El dedo controla el giro sobre la ruleta. */
     touch-action: none;
+
     user-select: none;
     -webkit-user-select: none;
 
     cursor: grab;
 }
 
-#ruleta.arrastrando {
+.ruleta.arrastrando {
     cursor: grabbing;
 }
 
-#imagen-ruleta {
+.ruleta > .imagen-ruleta {
     display: block;
+
     width: 100%;
+    max-width: 100%;
     height: 100%;
+
     object-fit: contain;
     transform-origin: center;
 }
 
-#imagen-ruleta:focus-visible {
+.imagen-ruleta:focus-visible {
     outline: 3px solid #80e88a;
     outline-offset: 5px;
     border-radius: 50%;
@@ -214,9 +232,9 @@ p {
         font-size: 13px;
     }
 
-    #ruleta {
-        width: min(220px, 40vh);
-        width: min(220px, 40svh);
+    .ruleta {
+        width: min(180px, 35vh);
+        width: min(180px, 35svh);
     }
 
     .seccion-fija .indicacion-scroll {
@@ -224,7 +242,7 @@ p {
     }
 }
 
-/* MOVIMIENTO REDUCIDO */
+/* PREFERENCIA DE MOVIMIENTO REDUCIDO */
 
 @media (prefers-reduced-motion: reduce) {
     html {

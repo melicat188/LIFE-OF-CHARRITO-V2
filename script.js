@@ -2,6 +2,7 @@ const preferenciaMovimiento = window.matchMedia(
     "(prefers-reduced-motion: reduce)"
 );
 
+// Cada ruleta tiene su propia rotación e inercia.
 document.querySelectorAll(".ruleta").forEach((contenedor) => {
     const imagen = contenedor.querySelector(".imagen-ruleta");
 
@@ -39,6 +40,7 @@ document.querySelectorAll(".ruleta").forEach((contenedor) => {
         const x = evento.clientX - centroX;
         const y = evento.clientY - centroY;
 
+        // Cerca del centro, el ángulo es inestable.
         if (Math.hypot(x, y) < 20) {
             return null;
         }
@@ -87,7 +89,7 @@ document.querySelectorAll(".ruleta").forEach((contenedor) => {
 
         let diferencia = anguloActual - anguloAnterior;
 
-        // Evita saltos al cruzar entre 180° y -180°.
+        // Evita saltos al cruzar de 180° a -180°.
         diferencia = ((diferencia + 540) % 360) - 180;
 
         const tiempo = Math.max(ahora - tiempoAnterior, 1);
@@ -110,6 +112,8 @@ document.querySelectorAll(".ruleta").forEach((contenedor) => {
             ultimoFrame = ahora;
 
             rotacion += velocidad * tiempo;
+
+            // Reduce la velocidad progresivamente.
             velocidad *= Math.pow(0.95, tiempo / 16.67);
 
             dibujar();
@@ -128,6 +132,7 @@ document.querySelectorAll(".ruleta").forEach((contenedor) => {
     function terminarArrastre(evento, usarInercia) {
         if (evento.pointerId !== punteroActivo) return;
 
+        // Limpia antes de liberar la captura.
         punteroActivo = null;
         anguloAnterior = null;
 
@@ -162,10 +167,12 @@ document.querySelectorAll(".ruleta").forEach((contenedor) => {
         terminarArrastre(evento, false);
     });
 
+    // Evita arrastrar el archivo de imagen con el mouse.
     imagen.addEventListener("dragstart", (evento) => {
         evento.preventDefault();
     });
 
+    // Control mediante teclado.
     imagen.addEventListener("keydown", (evento) => {
         if (evento.key !== "ArrowLeft" && evento.key !== "ArrowRight") {
             return;
