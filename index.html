@@ -72,6 +72,7 @@
     </section>
 
     <!-- PRIMERA RULETA -->
+
     <div class="tramo-pausa">
         <section class="seccion-fija">
             <h1>GIRA LA RULETA</h1>
@@ -98,11 +99,11 @@
         <h1>Pierdes las dos gemas de Charrito</h1>
 
         <p>Pero él realmente necesita las gemas...</p>
-
         <p>Apuestas la última gema.</p>
     </section>
 
     <!-- SEGUNDA RULETA -->
+
     <div class="tramo-pausa">
         <section class="seccion-fija">
             <h1>UNA ÚLTIMA OPORTUNIDAD</h1>
@@ -166,23 +167,25 @@
         </p>
     </section>
 
-    <!-- DOS DADOS CON MOVIMIENTO POR VOLUMEN -->
-    <section>
+    <!-- ESTOS DADOS REACCIONAN AL MICRÓFONO -->
+
+    <section id="seccion-soplido">
         <h1>Sopla los dados por el buen augurio</h1>
 
+        <p>Activa el micrófono y sopla suavemente hacia él.</p>
 
-        <div class="contenedor-dados">
+        <div class="contenedor-dados" id="dados-soplido">
             <img
                 class="dado"
                 src="assets/dado.png"
-                alt="Primer dado"
+                alt="Primer dado para soplar"
                 draggable="false"
             >
 
             <img
                 class="dado"
                 src="assets/dado.png"
-                alt="Segundo dado"
+                alt="Segundo dado para soplar"
                 draggable="false"
             >
         </div>
@@ -207,6 +210,41 @@
             max="1"
             value="0"
         ></meter>
+    </section>
+
+    <!-- ESTOS DADOS REACCIONAN AL MOVIMIENTO -->
+
+    <section id="seccion-sacudida">
+        <h1>Debes sacudir para tirar...</h1>
+
+        <p>
+            Activa el movimiento y sacude suavemente tu celular
+            para mover los dados.
+        </p>
+
+        <div class="contenedor-dados" id="dados-sacudida">
+            <img
+                class="dado"
+                src="assets/dado.png"
+                alt="Primer dado para sacudir"
+                draggable="false"
+            >
+
+            <img
+                class="dado"
+                src="assets/dado.png"
+                alt="Segundo dado para sacudir"
+                draggable="false"
+            >
+        </div>
+
+        <button
+            id="activar-movimiento"
+            type="button"
+            aria-pressed="false"
+        >
+            Activar movimiento
+        </button>
 
     </section>
 
