@@ -31,7 +31,7 @@ section {
     padding: 30px 20px;
 }
 
-/* TÍTULOS */
+/* TEXTOS */
 
 h1 {
     max-width: 100%;
@@ -39,8 +39,6 @@ h1 {
     font-size: clamp(32px, 8vw, 60px);
     overflow-wrap: break-word;
 }
-
-/* PÁRRAFOS */
 
 p {
     max-width: 600px;
@@ -86,7 +84,6 @@ p {
 
 .contenedor-verdes img {
     display: block;
-
     width: calc((100% - 40px) / 3);
     max-width: 200px;
     height: auto;
@@ -102,12 +99,11 @@ p {
     }
 }
 
-/* SECCIONES FIJAS DURANTE EL SCROLL */
+/* SECCIONES FIJAS */
 
 /*
-   Aumenta 220 a 300 en ambas líneas
-   para que la sección permanezca fija más tiempo
-   mientras deslizas.
+   Aumenta 220 a 300 en ambas líneas para
+   extender el recorrido de la pausa.
 */
 
 .tramo-pausa {
@@ -145,23 +141,21 @@ p {
     line-height: 1.4;
 }
 
-/* TAMAÑO DE LAS DOS RULETAS */
+/* AMBAS RULETAS */
 
 .ruleta {
-    /* Primera línea: respaldo para navegadores antiguos. */
-    width: 280px;
-    width: min(280px, 70vw, 40svh);
+    width: 260px;
+    height: 260px;
 
-    max-width: 100%;
-    height: auto;
-    aspect-ratio: 1;
+    width: min(260px, 70vw, 38vh);
+    height: min(260px, 70vw, 38vh);
 
-    /* Evita que el contenedor cambie de tamaño. */
+    width: min(260px, 70vw, 38svh);
+    height: min(260px, 70vw, 38svh);
+
     flex: 0 0 auto;
 
-    /* El dedo controla el giro sobre la ruleta. */
     touch-action: none;
-
     user-select: none;
     -webkit-user-select: none;
 
@@ -174,11 +168,8 @@ p {
 
 .ruleta > .imagen-ruleta {
     display: block;
-
     width: 100%;
-    max-width: 100%;
     height: 100%;
-
     object-fit: contain;
     transform-origin: center;
 }
@@ -192,6 +183,69 @@ p {
 .seccion-fija .indicacion-scroll {
     font-size: 14px;
     color: #aaa;
+}
+
+/* DOS DADOS */
+
+.contenedor-dados {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 24px;
+
+    width: 100%;
+    max-width: 360px;
+    margin: 25px 0;
+    padding: 12px;
+}
+
+.contenedor-dados .dado {
+    display: block;
+    width: calc((100% - 24px) / 2);
+    max-width: 130px;
+    height: auto;
+    object-fit: contain;
+    transform-origin: center;
+}
+
+/* MICRÓFONO */
+
+#activar-microfono {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 12px;
+
+    background-color: #80e88a;
+    color: #111;
+
+    font: inherit;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#activar-microfono:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+#activar-microfono:focus-visible {
+    outline: 3px solid white;
+    outline-offset: 4px;
+}
+
+#estado-microfono {
+    font-size: 15px;
+}
+
+#nivel-soplido {
+    width: 200px;
+    max-width: 80%;
+    height: 18px;
+    margin-top: 8px;
+}
+
+.nota-microfono {
+    font-size: 13px;
 }
 
 /* CELULARES */
@@ -234,7 +288,10 @@ p {
 
     .ruleta {
         width: min(180px, 35vh);
+        height: min(180px, 35vh);
+
         width: min(180px, 35svh);
+        height: min(180px, 35svh);
     }
 
     .seccion-fija .indicacion-scroll {
@@ -242,7 +299,7 @@ p {
     }
 }
 
-/* PREFERENCIA DE MOVIMIENTO REDUCIDO */
+/* MOVIMIENTO REDUCIDO */
 
 @media (prefers-reduced-motion: reduce) {
     html {
