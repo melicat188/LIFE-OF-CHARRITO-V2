@@ -6,8 +6,9 @@
 
     <title>Life of Charrito</title>
 
-    <link rel="stylesheet" href="style.css?v=8">
-    <script src="script.js?v=8" defer></script>
+    <link rel="stylesheet" href="style.css?v=10">
+    <script src="script.js?v=10" defer></script>
+    <script src="camara.js?v=10" defer></script>
 </head>
 
 <body>
@@ -180,7 +181,6 @@
                 alt="Primer dado para soplar"
                 draggable="false"
             >
-
             <img
                 class="dado"
                 src="assets/dado.png"
@@ -227,7 +227,6 @@
                 alt="Primer dado de la primera tirada"
                 draggable="false"
             >
-
             <img
                 class="dado"
                 src="assets/dado.png"
@@ -309,7 +308,6 @@
                 alt="Primer dado de la segunda tirada"
                 draggable="false"
             >
-
             <img
                 class="dado"
                 src="assets/dado.png"
@@ -366,7 +364,6 @@
                 alt="Primer dado de la tercera tirada"
                 draggable="false"
             >
-
             <img
                 class="dado"
                 src="assets/dado.png"
@@ -409,7 +406,7 @@
         </p>
     </section>
 
-    <!-- CARTAS QUE REACCIONAN A LA LUZ -->
+    <!-- CARTAS -->
 
     <section id="seccion-cartas">
         <h1>El enfrentamiento definitivo con el borracho ha llegado</h1>
@@ -421,8 +418,8 @@
         </p>
 
         <p>
-            Activa la cámara con poca luz.
-            Después, destápala o apunta hacia un lugar más iluminado.
+            Activa la cámara cubriéndola parcialmente.
+            Cuando termine de calibrar, destápala para voltear las cartas.
         </p>
 
         <div class="cartas">
@@ -431,7 +428,6 @@
                     <div class="carta-cara">
                         <img src="assets/carta.jpg" alt="Primera carta">
                     </div>
-
                     <div class="carta-cara carta-reverso" aria-hidden="true">
                         <img src="assets/carta.jpg" alt="">
                     </div>
@@ -443,7 +439,6 @@
                     <div class="carta-cara">
                         <img src="assets/carta.jpg" alt="Segunda carta">
                     </div>
-
                     <div class="carta-cara carta-reverso" aria-hidden="true">
                         <img src="assets/carta.jpg" alt="">
                     </div>
@@ -455,7 +450,6 @@
                     <div class="carta-cara">
                         <img src="assets/carta.jpg" alt="Tercera carta">
                     </div>
-
                     <div class="carta-cara carta-reverso" aria-hidden="true">
                         <img src="assets/carta.jpg" alt="">
                     </div>
@@ -473,7 +467,7 @@
         </button>
 
         <p id="estado-camara" class="estado-control" role="status">
-            La cámara está apagada.
+            Cargando control de cámara…
         </p>
 
         <label for="nivel-luz">Brillo detectado</label>
@@ -487,7 +481,7 @@
         ></meter>
 
         <p class="nota">
-            La imagen de la cámara se analiza en tu dispositivo.
+            La imagen se analiza en tu dispositivo.
             No se graba ni se envía.
         </p>
 
