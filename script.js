@@ -3,7 +3,43 @@ const preferenciaMovimiento = window.matchMedia(
 );
 
 /* =========================================
-   RULETAS INDEPENDIENTES
+   FUNCIONES PARA LOS DADOS
+========================================= */
+
+function restablecerDados(dados) {
+    dados.forEach((dado) => {
+        dado.style.transform = "";
+    });
+}
+
+function moverDados(dados, intensidad, ahora, amplitud) {
+    if (preferenciaMovimiento.matches) {
+        restablecerDados(dados);
+        return;
+    }
+
+    dados.forEach((dado, indice) => {
+        const fase = indice * 2.4;
+
+        const x =
+            Math.sin(ahora * 0.035 + fase) *
+            intensidad * amplitud;
+
+        const y =
+            Math.cos(ahora * 0.029 + fase) *
+            intensidad * amplitud * 0.75;
+
+        const giro =
+            Math.sin(ahora * 0.025 + fase) *
+            intensidad * amplitud * 1.5;
+
+        dado.style.transform =
+            `translate(${x}px, ${y}px) rotate(${giro}deg)`;
+    });
+}
+
+/* =========================================
+   RULETAS
 ========================================= */
 
 document.querySelectorAll(".ruleta").forEach((contenedor) => {
@@ -45,9 +81,7 @@ document.querySelectorAll(".ruleta").forEach((contenedor) => {
         const x = evento.clientX - centroX;
         const y = evento.clientY - centroY;
 
-        if (Math.hypot(x, y) < 20) {
-            return null;
-        }
+        if (Math.hypot(x, y) < 20) return null;
 
         return Math.atan2(y, x) * 180 / Math.PI;
     }
@@ -60,7 +94,6 @@ document.querySelectorAll(".ruleta").forEach((contenedor) => {
         }
 
         evento.preventDefault();
-
         detenerInercia();
         actualizarCentro();
 
@@ -94,7 +127,6 @@ document.querySelectorAll(".ruleta").forEach((contenedor) => {
 
         let diferencia = anguloActual - anguloAnterior;
 
-        // Evita saltos entre 180° y -180°.
         diferencia = ((diferencia + 540) % 360) - 180;
 
         const tiempo = Math.max(ahora - tiempoAnterior, 1);
@@ -184,32 +216,27 @@ document.querySelectorAll(".ruleta").forEach((contenedor) => {
         detenerInercia();
 
         rotacion += evento.key === "ArrowRight" ? 15 : -15;
-
         dibujar();
     });
 
     preferenciaMovimiento.addEventListener("change", (evento) => {
-        if (evento.matches) {
-            detenerInercia();
-        }
+        if (evento.matches) detenerInercia();
     });
 
     dibujar();
 });
 
 /* =========================================
-   DADOS Y MICRÓFONO
+   DADOS PARA SOPLAR
 ========================================= */
 
 (() => {
     const boton = document.getElementById("activar-microfono");
     const estado = document.getElementById("estado-microfono");
     const medidor = document.getElementById("nivel-soplido");
-    const dados = document.querySelectorAll(".contenedor-dados .dado");
+    const dados = document.querySelectorAll("#dados-soplido .dado");
 
-    if (!boton || !estado || !medidor || dados.length === 0) {
-        return;
-    }
+    if (!boton || !estado || !medidor || !dados.length) return;
 
     let contextoAudio = null;
     let flujo = null;
@@ -223,24 +250,13 @@ document.querySelectorAll(".ruleta").forEach((contenedor) => {
     let version = 0;
     let intensidad = 0;
 
-    // Aumenta este valor si reacciona demasiado al ruido.
     const UMBRAL = 0.025;
-
-    // Disminuye este valor si necesitas soplar muy fuerte.
     const VOLUMEN_MAXIMO = 0.18;
-
-    function restablecerDados() {
-        dados.forEach((dado) => {
-            dado.style.transform = "";
-        });
-    }
 
     function detenerMicrofono(
         mensaje = "El micrófono está apagado."
     ) {
-        // Invalida las solicitudes de activación pendientes.
         version += 1;
-
         activo = false;
         iniciando = false;
 
@@ -260,10 +276,8 @@ document.querySelectorAll(".ruleta").forEach((contenedor) => {
         }
 
         if (contextoAudio) {
-            const contextoAnterior = contextoAudio;
+            contextoAudio.close().catch(() => {});
             contextoAudio = null;
-
-            contextoAnterior.close().catch(() => {});
         }
 
         analizador = null;
@@ -271,7 +285,7 @@ document.querySelectorAll(".ruleta").forEach((contenedor) => {
         intensidad = 0;
 
         medidor.value = 0;
-        restablecerDados();
+        restablecerDados(dados);
 
         boton.disabled = false;
         boton.textContent = "Activar micrófono";
@@ -287,17 +301,16 @@ document.querySelectorAll(".ruleta").forEach((contenedor) => {
 
         let media = 0;
 
-        for (let i = 0; i < datos.length; i++) {
-            media += datos[i];
+        for (const muestra of datos) {
+            media += muestra;
         }
 
         media /= datos.length;
 
         let suma = 0;
 
-        for (let i = 0; i < datos.length; i++) {
-            const muestra = datos[i] - media;
-            suma += muestra * muestra;
+        for (const muestra of datos) {
+            suma += (muestra - media) ** 2;
         }
 
         const volumen = Math.sqrt(suma / datos.length);
@@ -310,30 +323,10 @@ document.querySelectorAll(".ruleta").forEach((contenedor) => {
             )
         );
 
-        // Suaviza los cambios de intensidad.
         intensidad += (objetivo - intensidad) * 0.18;
 
         medidor.value = intensidad;
-
-        if (preferenciaMovimiento.matches) {
-            restablecerDados();
-        } else {
-            dados.forEach((dado, indice) => {
-                const fase = indice * 2.4;
-
-                const x =
-                    Math.sin(ahora * 0.035 + fase) * intensidad * 4;
-
-                const y =
-                    Math.cos(ahora * 0.029 + fase) * intensidad * 3;
-
-                const giro =
-                    Math.sin(ahora * 0.025 + fase) * intensidad * 5;
-
-                dado.style.transform =
-                    `translate(${x}px, ${y}px) rotate(${giro}deg)`;
-            });
-        }
+        moverDados(dados, intensidad, ahora, 4);
 
         animacion = requestAnimationFrame(actualizarDados);
     }
@@ -346,7 +339,7 @@ document.querySelectorAll(".ruleta").forEach((contenedor) => {
             !navigator.mediaDevices?.getUserMedia
         ) {
             estado.textContent =
-                "Abre la página mediante HTTPS en un navegador compatible para usar el micrófono.";
+                "Abre la página mediante HTTPS para usar el micrófono.";
             return;
         }
 
@@ -360,13 +353,12 @@ document.querySelectorAll(".ruleta").forEach((contenedor) => {
         }
 
         const solicitud = ++version;
-        iniciando = true;
 
-        boton.disabled = true;
+        iniciando = true;
+        boton.textContent = "Cancelar activación";
         estado.textContent = "Permite el acceso al micrófono…";
 
         try {
-            // Se inicia desde el toque del usuario.
             const contexto = new AudioContextDisponible();
             contextoAudio = contexto;
 
@@ -383,7 +375,6 @@ document.querySelectorAll(".ruleta").forEach((contenedor) => {
                 video: false
             });
 
-            // Apaga el flujo si la solicitud ya fue cancelada.
             if (solicitud !== version) {
                 nuevoFlujo.getTracks().forEach((pista) => pista.stop());
                 return;
@@ -393,22 +384,19 @@ document.querySelectorAll(".ruleta").forEach((contenedor) => {
 
             analizador = contexto.createAnalyser();
             analizador.fftSize = 2048;
-
             datos = new Float32Array(analizador.fftSize);
 
             fuente = contexto.createMediaStreamSource(flujo);
             fuente.connect(analizador);
 
-            // No se conecta a los altavoces.
             activo = true;
             iniciando = false;
 
-            boton.disabled = false;
             boton.textContent = "Apagar micrófono";
             boton.setAttribute("aria-pressed", "true");
 
             estado.textContent = preferenciaMovimiento.matches
-                ? "Micrófono activo. Sopla para mover el indicador de volumen."
+                ? "Micrófono activo. La animación está desactivada por tu preferencia de movimiento reducido; observa la barra."
                 : "Micrófono activo. ¡Sopla para mover los dados!";
 
             flujo.getAudioTracks().forEach((pista) => {
@@ -429,34 +417,325 @@ document.querySelectorAll(".ruleta").forEach((contenedor) => {
 
             if (error.name === "NotAllowedError") {
                 mensaje =
-                    "Permite el micrófono en los ajustes de este sitio e inténtalo de nuevo.";
+                    "Permite el micrófono en los ajustes de este sitio.";
             } else if (error.name === "NotFoundError") {
                 mensaje = "No se encontró un micrófono disponible.";
             } else if (error.name === "NotReadableError") {
                 mensaje =
-                    "El micrófono no está disponible. Revisa si otra aplicación lo está usando.";
+                    "El micrófono no está disponible o lo usa otra aplicación.";
             }
 
             detenerMicrofono(mensaje);
         }
     }
 
+    boton.disabled = false;
+
     boton.addEventListener("click", () => {
-        if (activo) {
+        if (activo || iniciando) {
             detenerMicrofono();
         } else {
             activarMicrofono();
         }
     });
 
-    // Apaga el micrófono al cambiar de pestaña o aplicación.
     document.addEventListener("visibilitychange", () => {
         if (document.hidden && (activo || iniciando)) {
             detenerMicrofono();
         }
     });
 
-    window.addEventListener("pagehide", () => {
-        detenerMicrofono();
+    window.addEventListener("pagehide", () => detenerMicrofono());
+})();
+
+/* =========================================
+   DADOS PARA SACUDIR
+========================================= */
+
+(() => {
+    const boton = document.getElementById("activar-movimiento");
+    const estado = document.getElementById("estado-movimiento");
+    const nota = document.getElementById("nota-movimiento");
+    const medidor = document.getElementById("nivel-sacudida");
+    const dados = document.querySelectorAll("#dados-sacudida .dado");
+
+    if (!boton || !estado || !medidor || !dados.length) return;
+
+    let activo = false;
+    let iniciando = false;
+    let version = 0;
+
+    let animacion = null;
+    let temporizador = null;
+
+    let intensidad = 0;
+    let ultimoFrame = 0;
+    let ultimaLectura = null;
+    let gravedad = null;
+    let datosRecibidos = false;
+
+    // Mayor sensibilidad que la versión anterior.
+    const UMBRAL_SACUDIDA = 0.3;
+    const FUERZA_MAXIMA = 5;
+
+    function actualizarNota() {
+        if (!nota) return;
+
+        nota.textContent = preferenciaMovimiento.matches
+            ? "Tu celular indica una preferencia de movimiento reducido. La barra funciona, pero la animación de los dados está desactivada."
+            : "";
+    }
+
+    actualizarNota();
+
+    preferenciaMovimiento.addEventListener("change", () => {
+        actualizarNota();
+
+        if (preferenciaMovimiento.matches) {
+            restablecerDados(dados);
+        }
     });
+
+    function detenerMovimiento(
+        mensaje = "El sensor de movimiento está apagado."
+    ) {
+        version += 1;
+        activo = false;
+        iniciando = false;
+
+        window.removeEventListener(
+            "devicemotion",
+            detectarMovimiento
+        );
+
+        clearTimeout(temporizador);
+        temporizador = null;
+
+        if (animacion !== null) {
+            cancelAnimationFrame(animacion);
+            animacion = null;
+        }
+
+        intensidad = 0;
+        ultimoFrame = 0;
+        ultimaLectura = null;
+        gravedad = null;
+        datosRecibidos = false;
+
+        medidor.value = 0;
+        restablecerDados(dados);
+
+        boton.disabled = false;
+        boton.textContent = "Activar movimiento";
+        boton.setAttribute("aria-pressed", "false");
+
+        estado.textContent = mensaje;
+    }
+
+    function tieneCoordenadas(vector) {
+        return vector &&
+            Number.isFinite(vector.x) &&
+            Number.isFinite(vector.y) &&
+            Number.isFinite(vector.z);
+    }
+
+    function detectarMovimiento(evento) {
+        if (!activo) return;
+
+        const ahora = performance.now();
+
+        let vector = evento.acceleration;
+        let fuerza = 0;
+
+        if (tieneCoordenadas(vector)) {
+            // Aceleración sin gravedad.
+            fuerza = Math.hypot(vector.x, vector.y, vector.z);
+        } else {
+            // Respaldo para sensores que incluyen gravedad.
+            vector = evento.accelerationIncludingGravity;
+
+            if (!tieneCoordenadas(vector)) return;
+
+            if (!gravedad) {
+                gravedad = {
+                    x: vector.x,
+                    y: vector.y,
+                    z: vector.z
+                };
+            }
+
+            const tiempo = ultimaLectura === null
+                ? 16.67
+                : Math.min(ahora - ultimaLectura, 100);
+
+            const filtro = Math.exp(-tiempo / 250);
+
+            gravedad.x =
+                filtro * gravedad.x + (1 - filtro) * vector.x;
+
+            gravedad.y =
+                filtro * gravedad.y + (1 - filtro) * vector.y;
+
+            gravedad.z =
+                filtro * gravedad.z + (1 - filtro) * vector.z;
+
+            fuerza = Math.hypot(
+                vector.x - gravedad.x,
+                vector.y - gravedad.y,
+                vector.z - gravedad.z
+            );
+        }
+
+        ultimaLectura = ahora;
+
+        if (!datosRecibidos) {
+            datosRecibidos = true;
+
+            clearTimeout(temporizador);
+            temporizador = null;
+
+            estado.textContent =
+                "¡Sensor listo! Sacude suavemente el celular y observa la barra.";
+        }
+
+        const nuevaIntensidad = Math.max(
+            0,
+            Math.min(
+                1,
+                (fuerza - UMBRAL_SACUDIDA) /
+                (FUERZA_MAXIMA - UMBRAL_SACUDIDA)
+            )
+        );
+
+        intensidad = Math.max(intensidad, nuevaIntensidad);
+    }
+
+    function animarDados(ahora) {
+        if (!activo) return;
+
+        const tiempo = ultimoFrame
+            ? Math.min(ahora - ultimoFrame, 50)
+            : 16.67;
+
+        ultimoFrame = ahora;
+
+        medidor.value = intensidad;
+
+        // Movimiento más visible: hasta 20 px.
+        moverDados(dados, intensidad, ahora, 20);
+
+        // Vuelve suavemente al reposo.
+        intensidad *= Math.exp(-tiempo / 300);
+
+        if (intensidad < 0.001) {
+            intensidad = 0;
+        }
+
+        animacion = requestAnimationFrame(animarDados);
+    }
+
+    async function activarMovimiento() {
+        if (activo || iniciando) return;
+
+        if (!window.isSecureContext) {
+            estado.textContent =
+                "Abre la página mediante HTTPS para usar el movimiento.";
+            return;
+        }
+
+        const SensorMovimiento = window.DeviceMotionEvent;
+
+        if (!SensorMovimiento) {
+            estado.textContent =
+                "Este navegador no ofrece acceso al sensor de movimiento.";
+            return;
+        }
+
+        const solicitud = ++version;
+
+        iniciando = true;
+
+        // El botón nunca queda bloqueado.
+        boton.disabled = false;
+        boton.textContent = "Cancelar activación";
+
+        estado.textContent = "Activando el sensor…";
+
+        temporizador = setTimeout(() => {
+            if (solicitud === version && !datosRecibidos) {
+                detenerMovimiento(
+                    "No se recibieron datos. Permite los sensores de movimiento en los ajustes del sitio y abre el enlace directamente en Chrome o Safari."
+                );
+            }
+        }, 10000);
+
+        try {
+            // En Android normalmente no se necesita esta solicitud.
+            // Safari en iPhone sí puede exigirla.
+            if (
+                typeof SensorMovimiento.requestPermission === "function"
+            ) {
+                const permiso =
+                    await SensorMovimiento.requestPermission();
+
+                if (solicitud !== version) return;
+
+                if (permiso !== "granted") {
+                    detenerMovimiento(
+                        "El permiso fue rechazado. Permite el movimiento en los ajustes del sitio."
+                    );
+                    return;
+                }
+            }
+
+            if (solicitud !== version) return;
+
+            activo = true;
+            iniciando = false;
+
+            intensidad = 0;
+            gravedad = null;
+            ultimaLectura = null;
+            ultimoFrame = 0;
+            datosRecibidos = false;
+
+            boton.textContent = "Apagar movimiento";
+            boton.setAttribute("aria-pressed", "true");
+
+            estado.textContent =
+                "Esperando datos. Mueve suavemente el celular.";
+
+            window.addEventListener(
+                "devicemotion",
+                detectarMovimiento,
+                { passive: true }
+            );
+
+            animacion = requestAnimationFrame(animarDados);
+        } catch (error) {
+            if (solicitud !== version) return;
+
+            detenerMovimiento(
+                "No se pudo activar el sensor. Revisa los permisos de movimiento del navegador."
+            );
+        }
+    }
+
+    boton.disabled = false;
+
+    boton.addEventListener("click", () => {
+        if (activo || iniciando) {
+            detenerMovimiento();
+        } else {
+            activarMovimiento();
+        }
+    });
+
+    document.addEventListener("visibilitychange", () => {
+        if (document.hidden && (activo || iniciando)) {
+            detenerMovimiento();
+        }
+    });
+
+    window.addEventListener("pagehide", () => detenerMovimiento());
 })();

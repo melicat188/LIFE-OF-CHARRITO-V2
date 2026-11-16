@@ -48,6 +48,10 @@ p {
     line-height: 1.6;
 }
 
+.nota {
+    font-size: 14px;
+}
+
 /* IMAGEN DE CHARRITO */
 
 .contenedor-imagen {
@@ -55,6 +59,7 @@ p {
     max-width: 600px;
     height: 350px;
     margin-top: 30px;
+
     border-radius: 20px;
     overflow: hidden;
     background-color: #222;
@@ -98,7 +103,7 @@ p {
     }
 }
 
-/* SECCIONES FIJAS DURANTE EL SCROLL */
+/* SECCIONES FIJAS */
 
 .tramo-pausa {
     height: 220vh;
@@ -184,18 +189,18 @@ p {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 24px;
+    gap: 30px;
 
     width: 100%;
     max-width: 360px;
     margin: 25px 0;
-    padding: 16px;
+    padding: 24px;
 }
 
 .contenedor-dados .dado {
     display: block;
-    width: calc((100% - 24px) / 2);
-    max-width: 130px;
+    width: calc((100% - 30px) / 2);
+    max-width: 120px;
     height: auto;
 
     object-fit: contain;
@@ -241,9 +246,9 @@ p {
 
 #nivel-soplido,
 #nivel-sacudida {
-    width: 200px;
+    width: 220px;
     max-width: 80%;
-    height: 18px;
+    height: 20px;
     margin-top: 8px;
 }
 
@@ -309,3 +314,4 @@ p {
         transition: none;
     }
 }
+
