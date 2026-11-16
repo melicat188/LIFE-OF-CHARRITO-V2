@@ -3,7 +3,7 @@ const preferenciaMovimiento = window.matchMedia(
 );
 
 /* =========================================
-   FUNCIONES PARA LOS DADOS
+   FUNCIONES COMPARTIDAS
 ========================================= */
 
 function restablecerDados(dados) {
@@ -36,6 +36,13 @@ function moverDados(dados, intensidad, ahora, amplitud) {
         dado.style.transform =
             `translate(${x}px, ${y}px) rotate(${giro}deg)`;
     });
+}
+
+function estaVisible(elemento) {
+    const limites = elemento.getBoundingClientRect();
+
+    return limites.bottom > 0 &&
+        limites.top < window.innerHeight;
 }
 
 /* =========================================
@@ -99,7 +106,6 @@ document.querySelectorAll(".ruleta").forEach((contenedor) => {
 
         punteroActivo = evento.pointerId;
         anguloAnterior = obtenerAngulo(evento);
-
         tiempoAnterior = performance.now();
         ultimoMovimiento = tiempoAnterior;
 
@@ -286,7 +292,6 @@ document.querySelectorAll(".ruleta").forEach((contenedor) => {
         medidor.value = 0;
         restablecerDados(dados);
 
-        boton.disabled = false;
         boton.textContent = "Activar micrófono";
         boton.setAttribute("aria-pressed", "false");
         estado.textContent = mensaje;
@@ -414,8 +419,7 @@ document.querySelectorAll(".ruleta").forEach((contenedor) => {
             let mensaje = "No se pudo activar el micrófono.";
 
             if (error.name === "NotAllowedError") {
-                mensaje =
-                    "Permite el micrófono en los ajustes de este sitio.";
+                mensaje = "Permite el micrófono en los ajustes del sitio.";
             } else if (error.name === "NotFoundError") {
                 mensaje = "No se encontró un micrófono disponible.";
             } else if (error.name === "NotReadableError") {
@@ -426,8 +430,6 @@ document.querySelectorAll(".ruleta").forEach((contenedor) => {
             detenerMicrofono(mensaje);
         }
     }
-
-    boton.disabled = false;
 
     boton.addEventListener("click", () => {
         if (activo || iniciando) {
@@ -451,11 +453,9 @@ document.querySelectorAll(".ruleta").forEach((contenedor) => {
 ========================================= */
 
 (() => {
-    // Solo una sección puede usar el movimiento a la vez.
     let detenerSeccionActual = null;
 
     document.querySelectorAll(".seccion-sacudida").forEach((seccion) => {
-        // Cada búsqueda se limita a esta sección.
         const boton = seccion.querySelector(".activar-movimiento");
         const estado = seccion.querySelector(".estado-movimiento");
         const nota = seccion.querySelector(".nota-movimiento");
@@ -498,13 +498,6 @@ document.querySelectorAll(".ruleta").forEach((contenedor) => {
             }
         });
 
-        function estaVisible() {
-            const limites = seccion.getBoundingClientRect();
-
-            return limites.bottom > 0 &&
-                limites.top < window.innerHeight;
-        }
-
         function detenerMovimiento(
             mensaje = "El sensor de movimiento está apagado."
         ) {
@@ -534,10 +527,8 @@ document.querySelectorAll(".ruleta").forEach((contenedor) => {
             medidor.value = 0;
             restablecerDados(dados);
 
-            boton.disabled = false;
             boton.textContent = "Activar movimiento";
             boton.setAttribute("aria-pressed", "false");
-
             estado.textContent = mensaje;
 
             if (detenerSeccionActual === detenerMovimiento) {
@@ -555,7 +546,7 @@ document.querySelectorAll(".ruleta").forEach((contenedor) => {
         function detectarMovimiento(evento) {
             if (!activo) return;
 
-            if (!estaVisible()) {
+            if (!estaVisible(seccion)) {
                 detenerMovimiento();
                 return;
             }
@@ -606,7 +597,6 @@ document.querySelectorAll(".ruleta").forEach((contenedor) => {
 
             if (!datosRecibidos) {
                 datosRecibidos = true;
-
                 clearTimeout(temporizador);
                 temporizador = null;
 
@@ -629,7 +619,7 @@ document.querySelectorAll(".ruleta").forEach((contenedor) => {
         function animarDados(ahora) {
             if (!activo) return;
 
-            if (!estaVisible()) {
+            if (!estaVisible(seccion)) {
                 detenerMovimiento();
                 return;
             }
@@ -651,7 +641,7 @@ document.querySelectorAll(".ruleta").forEach((contenedor) => {
         }
 
         async function activarMovimiento() {
-            if (activo || iniciando || !estaVisible()) return;
+            if (activo || iniciando || !estaVisible(seccion)) return;
 
             if (!window.isSecureContext) {
                 estado.textContent =
@@ -667,7 +657,6 @@ document.querySelectorAll(".ruleta").forEach((contenedor) => {
                 return;
             }
 
-            // Desactiva cualquier otra tirada, incluso si pedía permiso.
             if (detenerSeccionActual) {
                 detenerSeccionActual();
             }
@@ -677,14 +666,13 @@ document.querySelectorAll(".ruleta").forEach((contenedor) => {
             const solicitud = ++version;
 
             iniciando = true;
-            boton.disabled = false;
             boton.textContent = "Cancelar activación";
             estado.textContent = "Activando el sensor…";
 
             temporizador = setTimeout(() => {
                 if (solicitud === version && !datosRecibidos) {
                     detenerMovimiento(
-                        "No se recibieron datos. Revisa el permiso de sensores de movimiento y abre el enlace directamente en Chrome o Safari."
+                        "No se recibieron datos. Revisa el permiso de sensores y abre el enlace directamente en Chrome o Safari."
                     );
                 }
             }, 10000);
@@ -700,7 +688,7 @@ document.querySelectorAll(".ruleta").forEach((contenedor) => {
 
                     if (permiso !== "granted") {
                         detenerMovimiento(
-                            "Permite el movimiento en los ajustes de este sitio."
+                            "Permite el movimiento en los ajustes del sitio."
                         );
                         return;
                     }
@@ -708,19 +696,13 @@ document.querySelectorAll(".ruleta").forEach((contenedor) => {
 
                 if (solicitud !== version) return;
 
-                if (document.hidden || !estaVisible()) {
+                if (document.hidden || !estaVisible(seccion)) {
                     detenerMovimiento();
                     return;
                 }
 
                 activo = true;
                 iniciando = false;
-
-                intensidad = 0;
-                gravedad = null;
-                ultimaLectura = null;
-                ultimoFrame = null;
-                datosRecibidos = false;
 
                 boton.textContent = "Apagar movimiento";
                 boton.setAttribute("aria-pressed", "true");
@@ -739,12 +721,10 @@ document.querySelectorAll(".ruleta").forEach((contenedor) => {
                 if (solicitud !== version) return;
 
                 detenerMovimiento(
-                    "No se pudo activar el sensor. Revisa los permisos del navegador."
+                    "No se pudo activar el sensor. Revisa los permisos."
                 );
             }
         }
-
-        boton.disabled = false;
 
         boton.addEventListener("click", () => {
             if (activo || iniciando) {
@@ -754,14 +734,10 @@ document.querySelectorAll(".ruleta").forEach((contenedor) => {
             }
         });
 
-        // Desactiva esta tirada cuando sale completamente de pantalla.
         if ("IntersectionObserver" in window) {
             const observador = new IntersectionObserver((entradas) => {
                 for (const entrada of entradas) {
-                    if (
-                        !entrada.isIntersecting &&
-                        (activo || iniciando)
-                    ) {
+                    if (!entrada.isIntersecting && (activo || iniciando)) {
                         detenerMovimiento();
                     }
                 }
@@ -776,8 +752,307 @@ document.querySelectorAll(".ruleta").forEach((contenedor) => {
             }
         });
 
-        window.addEventListener("pagehide", () => {
-            detenerMovimiento();
-        });
+        window.addEventListener("pagehide", () => detenerMovimiento());
     });
 })();
+
+/* =========================================
+   CARTAS QUE REACCIONAN A LA LUZ
+========================================= */
+
+(() => {
+    const seccion = document.getElementById("seccion-cartas");
+    const cartas = seccion?.querySelector(".cartas");
+    const nota = seccion?.querySelector(".nota-cartas");
+    const boton = document.getElementById("activar-camara");
+    const estado = document.getElementById("estado-camara");
+    const medidor = document.getElementById("nivel-luz");
+    const video = document.getElementById("video-luz");
+
+    if (!seccion || !cartas || !boton || !estado || !medidor || !video) {
+        return;
+    }
+
+    const canvas = document.createElement("canvas");
+    canvas.width = 32;
+    canvas.height = 24;
+
+    const contexto = canvas.getContext("2d", {
+        willReadFrequently: true
+    });
+
+    let flujo = null;
+    let activo = false;
+    let iniciando = false;
+    let version = 0;
+
+    let animacion = null;
+    let temporizador = null;
+    let ultimoAnalisis = null;
+
+    let muestrasIniciales = [];
+    let referencia = null;
+    let brilloSuavizado = null;
+    let cambioDesde = null;
+
+    function actualizarNota() {
+        if (!nota) return;
+
+        nota.textContent = preferenciaMovimiento.matches
+            ? "Movimiento reducido activado: las cartas cambian de posición sin animación."
+            : "";
+    }
+
+    actualizarNota();
+    preferenciaMovimiento.addEventListener("change", actualizarNota);
+
+    function detenerCamara(
+        mensaje = "La cámara está apagada."
+    ) {
+        version += 1;
+        activo = false;
+        iniciando = false;
+
+        clearTimeout(temporizador);
+        temporizador = null;
+
+        if (animacion !== null) {
+            cancelAnimationFrame(animacion);
+            animacion = null;
+        }
+
+        if (flujo) {
+            flujo.getTracks().forEach((pista) => pista.stop());
+            flujo = null;
+        }
+
+        video.pause();
+        video.srcObject = null;
+
+        muestrasIniciales = [];
+        referencia = null;
+        brilloSuavizado = null;
+        ultimoAnalisis = null;
+        cambioDesde = null;
+
+        medidor.value = 0;
+        cartas.classList.remove("reveladas");
+
+        boton.textContent = "Activar cámara";
+        boton.setAttribute("aria-pressed", "false");
+        estado.textContent = mensaje;
+    }
+
+    function medirBrillo() {
+        contexto.drawImage(
+            video,
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
+
+        const pixeles = contexto.getImageData(
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        ).data;
+
+        let total = 0;
+
+        for (let i = 0; i < pixeles.length; i += 4) {
+            total +=
+                pixeles[i] * 0.2126 +
+                pixeles[i + 1] * 0.7152 +
+                pixeles[i + 2] * 0.0722;
+        }
+
+        return total / (pixeles.length / 4);
+    }
+
+    function analizarLuz(ahora) {
+        if (!activo) return;
+
+        if (!estaVisible(seccion)) {
+            detenerCamara();
+            return;
+        }
+
+        try {
+            const puedeAnalizar =
+                video.readyState >= 2 &&
+                video.videoWidth > 0;
+
+            const tocaAnalizar =
+                ultimoAnalisis === null ||
+                ahora - ultimoAnalisis >= 120;
+
+            if (puedeAnalizar && tocaAnalizar) {
+                ultimoAnalisis = ahora;
+
+                const brillo = medirBrillo();
+
+                brilloSuavizado = brilloSuavizado === null
+                    ? brillo
+                    : brilloSuavizado + (brillo - brilloSuavizado) * 0.3;
+
+                medidor.value = brilloSuavizado;
+
+                if (referencia === null) {
+                    muestrasIniciales.push(brillo);
+
+                    if (muestrasIniciales.length >= 18) {
+                        referencia = muestrasIniciales.reduce(
+                            (suma, valor) => suma + valor,
+                            0
+                        ) / muestrasIniciales.length;
+
+                        clearTimeout(temporizador);
+                        temporizador = null;
+
+                        estado.textContent = referencia > 235
+                            ? "Hay mucha luz inicial. Apaga la cámara y actívala cubriéndola parcialmente para calibrar de nuevo."
+                            : "¡Listo! Deja entrar más luz en la cámara para voltear las cartas.";
+                    }
+                } else {
+                    const margen = Math.max(10, referencia * 0.15);
+
+                    const estanReveladas =
+                        cartas.classList.contains("reveladas");
+
+                    const debeCambiar = estanReveladas
+                        ? brilloSuavizado < referencia + margen * 0.35
+                        : brilloSuavizado > referencia + margen;
+
+                    if (debeCambiar) {
+                        if (cambioDesde === null) {
+                            cambioDesde = ahora;
+                        }
+
+                        if (ahora - cambioDesde >= 400) {
+                            cartas.classList.toggle(
+                                "reveladas",
+                                !estanReveladas
+                            );
+
+                            estado.textContent = estanReveladas
+                                ? "La luz bajó. Deja entrar más luz para volver a voltearlas."
+                                : "¡Más luz! Las tres cartas se voltearon.";
+
+                            cambioDesde = null;
+                        }
+                    } else {
+                        cambioDesde = null;
+                    }
+                }
+            }
+
+            animacion = requestAnimationFrame(analizarLuz);
+        } catch (error) {
+            detenerCamara(
+                "No se pudo analizar la cámara. Vuelve a intentarlo."
+            );
+        }
+    }
+
+    async function activarCamara() {
+        if (activo || iniciando) return;
+
+        if (
+            !window.isSecureContext ||
+            !navigator.mediaDevices?.getUserMedia
+        ) {
+            estado.textContent =
+                "Abre la página mediante HTTPS para usar la cámara.";
+            return;
+        }
+
+        if (!contexto) {
+            estado.textContent =
+                "Este navegador no permite analizar la imagen.";
+            return;
+        }
+
+        const solicitud = ++version;
+
+        iniciando = true;
+        boton.textContent = "Cancelar activación";
+        estado.textContent = "Permite el acceso a la cámara…";
+
+        temporizador = setTimeout(() => {
+            if (solicitud === version) {
+                detenerCamara(
+                    "La cámara no pudo prepararse. Revisa el permiso e inténtalo de nuevo."
+                );
+            }
+        }, 20000);
+
+        try {
+            const nuevoFlujo = await navigator.mediaDevices.getUserMedia({
+                audio: false,
+                video: {
+                    facingMode: { ideal: "environment" },
+                    width: { ideal: 320 },
+                    height: { ideal: 240 }
+                }
+            });
+
+            if (solicitud !== version) {
+                nuevoFlujo.getTracks().forEach((pista) => pista.stop());
+                return;
+            }
+
+            flujo = nuevoFlujo;
+            video.srcObject = flujo;
+            video.muted = true;
+
+            await video.play();
+
+            if (solicitud !== version) return;
+
+            if (document.hidden || !estaVisible(seccion)) {
+                detenerCamara();
+                return;
+            }
+
+            activo = true;
+            iniciando = false;
+
+            boton.textContent = "Apagar cámara";
+            boton.setAttribute("aria-pressed", "true");
+
+            estado.textContent =
+                "Calibrando… Mantén la cámara con poca luz durante unos dos segundos.";
+
+            flujo.getVideoTracks().forEach((pista) => {
+                pista.addEventListener("ended", () => {
+                    if (solicitud === version) {
+                        detenerCamara(
+                            "Se interrumpió la cámara. Puedes activarla de nuevo."
+                        );
+                    }
+                });
+            });
+
+            animacion = requestAnimationFrame(analizarLuz);
+        } catch (error) {
+            if (solicitud !== version) return;
+
+            let mensaje = "No se pudo activar la cámara.";
+
+            if (error.name === "NotAllowedError") {
+                mensaje =
+                    "Permite el acceso a la cámara en los ajustes del sitio.";
+            } else if (error.name === "NotFoundError") {
+                mensaje = "No se encontró una cámara disponible.";
+            } else if (error.name === "NotReadableError") {
+                mensaje =
+                    "La cámara no está disponible o la usa otra aplicación.";
+            }
+
+            detenerCamara(mensaje);
+        }
+    }
+
+   

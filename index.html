@@ -6,8 +6,8 @@
 
     <title>Life of Charrito</title>
 
-    <link rel="stylesheet" href="style.css?v=7">
-    <script src="script.js?v=7" defer></script>
+    <link rel="stylesheet" href="style.css?v=8">
+    <script src="script.js?v=8" defer></script>
 </head>
 
 <body>
@@ -218,9 +218,7 @@
     <section class="seccion-sacudida">
         <h1>Debes sacudir para tirar...</h1>
 
-        <p>
-            Toca “Activar movimiento” y sacude suavemente tu celular.
-        </p>
+        <p>Toca “Activar movimiento” y sacude suavemente tu celular.</p>
 
         <div class="contenedor-dados">
             <img
@@ -345,6 +343,15 @@
         <p class="nota nota-movimiento"></p>
     </section>
 
+    <section>
+        <h1>Pierdes de nuevo, ahora solo tienes tres gemas.</h1>
+
+        <p>
+            Pero esta es la única forma de seguir adelante,
+            decides arriesgarte una última vez.
+        </p>
+    </section>
+
     <!-- TERCERA SACUDIDA -->
 
     <section class="seccion-sacudida">
@@ -391,6 +398,109 @@
         </label>
 
         <p class="nota nota-movimiento"></p>
+    </section>
+
+    <section>
+        <h1>¡Lo lograste por fin!</h1>
+
+        <p>
+            Lograste vencer al celador,
+            pero a Charrito solo le queda una gema.
+        </p>
+    </section>
+
+    <!-- CARTAS QUE REACCIONAN A LA LUZ -->
+
+    <section id="seccion-cartas">
+        <h1>El enfrentamiento definitivo con el borracho ha llegado</h1>
+
+        <p>
+            Él te confronta con una revelación aterradora:
+            bajo estas tres cartas yacen los tres posibles
+            destinos de Charrito.
+        </p>
+
+        <p>
+            Activa la cámara con poca luz.
+            Después, destápala o apunta hacia un lugar más iluminado.
+        </p>
+
+        <div class="cartas">
+            <div class="carta">
+                <div class="carta-interior">
+                    <div class="carta-cara">
+                        <img src="assets/carta.jpg" alt="Primera carta">
+                    </div>
+
+                    <div class="carta-cara carta-reverso" aria-hidden="true">
+                        <img src="assets/carta.jpg" alt="">
+                    </div>
+                </div>
+            </div>
+
+            <div class="carta">
+                <div class="carta-interior">
+                    <div class="carta-cara">
+                        <img src="assets/carta.jpg" alt="Segunda carta">
+                    </div>
+
+                    <div class="carta-cara carta-reverso" aria-hidden="true">
+                        <img src="assets/carta.jpg" alt="">
+                    </div>
+                </div>
+            </div>
+
+            <div class="carta">
+                <div class="carta-interior">
+                    <div class="carta-cara">
+                        <img src="assets/carta.jpg" alt="Tercera carta">
+                    </div>
+
+                    <div class="carta-cara carta-reverso" aria-hidden="true">
+                        <img src="assets/carta.jpg" alt="">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button
+            id="activar-camara"
+            class="boton-control"
+            type="button"
+            aria-pressed="false"
+        >
+            Activar cámara
+        </button>
+
+        <p id="estado-camara" class="estado-control" role="status">
+            La cámara está apagada.
+        </p>
+
+        <label for="nivel-luz">Brillo detectado</label>
+
+        <meter
+            id="nivel-luz"
+            class="medidor-control"
+            min="0"
+            max="255"
+            value="0"
+        ></meter>
+
+        <p class="nota">
+            La imagen de la cámara se analiza en tu dispositivo.
+            No se graba ni se envía.
+        </p>
+
+        <p class="nota nota-cartas"></p>
+
+        <video
+            id="video-luz"
+            class="video-analisis"
+            autoplay
+            muted
+            playsinline
+            aria-hidden="true"
+        ></video>
     </section>
 
     <section>
