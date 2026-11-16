@@ -82,7 +82,7 @@
                 <img
                     class="imagen-ruleta"
                     src="assets/ruleta.png"
-                    alt="Primera ruleta. Puedes girarla con las flechas del teclado."
+                    alt="Primera ruleta. También puedes girarla con las flechas."
                     tabindex="0"
                     draggable="false"
                 >
@@ -113,7 +113,7 @@
                 <img
                     class="imagen-ruleta"
                     src="assets/ruleta.png"
-                    alt="Segunda ruleta. Puedes girarla con las flechas del teclado."
+                    alt="Segunda ruleta. También puedes girarla con las flechas."
                     tabindex="0"
                     draggable="false"
                 >
@@ -126,38 +126,94 @@
     </div>
 
     <section>
-    <h1>¡GANASTE 5 GEMAS!</h1>
-
-    <p>¡Bien Hecho!</p>
+        <h1>¡GANASTE 5 GEMAS!</h1>
+        <p>¡Bien hecho!</p>
     </section>
 
-<section>
-<h1>Le pagamos las gemas al informante...</h1>
-<p>Quien nos provee la información sobre el escondite del Borracho Malvado.
-    Él se encuentra en un  lugar llamado la Taverna del Vicio, este espacio es conocido por esta triste razón... 
-    Todas las personas que entran allí,se quedan apostando desde dinero, sus pertenencias, propiedades, hasta su libertad, y en el peor de los casos, su vida.
-</p>
-</section>
-<section>
-<h1>SEGUNDO TRIAL</h1>
-<p> Llegamos a la Taverna del Vicio...donde nos recibe un celador adicto a la nicotina.</p>
-<p> El celador no le va a permitir el ingreso a Charrito, a menos de que lo venza en una tirada de
-dados...</p>
+    <section>
+        <h1>Le pagamos las gemas al informante...</h1>
 
-<p>es muy arriesgado para Charrito, pero debe asumir este riesgo por el bien de la humanidad.
-</p>
-</section>
+        <p>
+            Quien nos provee la información sobre el escondite
+            del Borracho Malvado.
+        </p>
 
-<section>
-    <h1>Sopla los dados por el buen augurio</h1>
-    <div id = "dado1">
-    <img src = "assets/dado.png">
-    </div>
-  
-</section>
+        <p>
+            Él se encuentra en un lugar llamado la Taverna del Vicio.
+            Este espacio es conocido por esta triste razón:
+            todas las personas que entran allí se quedan apostando
+            desde dinero, sus pertenencias y propiedades hasta
+            su libertad y, en el peor de los casos, su vida.
+        </p>
+    </section>
 
+    <section>
+        <h1>SEGUNDO TRIAL</h1>
 
+        <p>
+            Llegamos a la Taverna del Vicio...
+            donde nos recibe un celador adicto a la nicotina.
+        </p>
 
+        <p>
+            El celador no le va a permitir el ingreso a Charrito,
+            a menos que lo venza en una tirada de dados...
+        </p>
+
+        <p>
+            Es muy arriesgado para Charrito, pero debe asumir
+            este riesgo por el bien de la humanidad.
+        </p>
+    </section>
+
+    <!-- DOS DADOS CON MOVIMIENTO POR VOLUMEN -->
+    <section>
+        <h1>Sopla los dados por el buen augurio</h1>
+
+        <p>Activa el micrófono y sopla suavemente hacia él.</p>
+
+        <div class="contenedor-dados">
+            <img
+                class="dado"
+                src="assets/dado.png"
+                alt="Primer dado"
+                draggable="false"
+            >
+
+            <img
+                class="dado"
+                src="assets/dado.png"
+                alt="Segundo dado"
+                draggable="false"
+            >
+        </div>
+
+        <button
+            id="activar-microfono"
+            type="button"
+            aria-pressed="false"
+        >
+            Activar micrófono
+        </button>
+
+        <p id="estado-microfono" role="status">
+            El micrófono está apagado.
+        </p>
+
+        <label for="nivel-soplido">Volumen del micrófono</label>
+
+        <meter
+            id="nivel-soplido"
+            min="0"
+            max="1"
+            value="0"
+        ></meter>
+
+        <p class="nota-microfono">
+            El sonido se analiza en tu navegador.
+            No se graba ni se envía.
+        </p>
+    </section>
 
     <section>
         <h1>NOO NO PUEDE SER</h1>
