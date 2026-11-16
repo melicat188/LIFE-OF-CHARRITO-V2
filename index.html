@@ -6,8 +6,8 @@
 
     <title>Life of Charrito</title>
 
-    <link rel="stylesheet" href="style.css">
-    <script src="script.js" defer></script>
+    <link rel="stylesheet" href="style.css?v=4">
+    <script src="script.js?v=4" defer></script>
 </head>
 
 <body>
@@ -97,7 +97,6 @@
 
     <section>
         <h1>Pierdes las dos gemas de Charrito</h1>
-
         <p>Pero él realmente necesita las gemas...</p>
         <p>Apuestas la última gema.</p>
     </section>
@@ -167,7 +166,7 @@
         </p>
     </section>
 
-    <!-- ESTOS DADOS REACCIONAN AL MICRÓFONO -->
+    <!-- DADOS PARA SOPLAR -->
 
     <section id="seccion-soplido">
         <h1>Sopla los dados por el buen augurio</h1>
@@ -203,23 +202,16 @@
         </p>
 
         <label for="nivel-soplido">Volumen del micrófono</label>
-
-        <meter
-            id="nivel-soplido"
-            min="0"
-            max="1"
-            value="0"
-        ></meter>
+        <meter id="nivel-soplido" min="0" max="1" value="0"></meter>
     </section>
 
-    <!-- ESTOS DADOS REACCIONAN AL MOVIMIENTO -->
+    <!-- DADOS PARA SACUDIR -->
 
     <section id="seccion-sacudida">
         <h1>Debes sacudir para tirar...</h1>
 
         <p>
-            Activa el movimiento y sacude suavemente tu celular
-            para mover los dados.
+            Toca “Activar movimiento” y sacude suavemente tu celular.
         </p>
 
         <div class="contenedor-dados" id="dados-sacudida">
@@ -251,13 +243,7 @@
         </p>
 
         <label for="nivel-sacudida">Intensidad del movimiento</label>
-
-        <meter
-            id="nivel-sacudida"
-            min="0"
-            max="1"
-            value="0"
-        ></meter>
+        <meter id="nivel-sacudida" min="0" max="1" value="0"></meter>
     </section>
 
     <section>

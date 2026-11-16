@@ -55,7 +55,6 @@ p {
     max-width: 600px;
     height: 350px;
     margin-top: 30px;
-
     border-radius: 20px;
     overflow: hidden;
     background-color: #222;
@@ -88,8 +87,8 @@ p {
     max-width: 200px;
     height: auto;
     aspect-ratio: 1;
-
     object-fit: contain;
+
     transition: transform 0.3s ease;
 }
 
@@ -99,12 +98,7 @@ p {
     }
 }
 
-/* SECCIONES FIJAS */
-
-/*
-   Aumenta 220 a 300 en ambas líneas para
-   extender el recorrido de la pausa.
-*/
+/* SECCIONES FIJAS DURANTE EL SCROLL */
 
 .tramo-pausa {
     height: 220vh;
@@ -141,7 +135,7 @@ p {
     line-height: 1.4;
 }
 
-/* AMBAS RULETAS */
+/* RULETAS */
 
 .ruleta {
     width: 260px;
@@ -182,10 +176,9 @@ p {
 
 .seccion-fija .indicacion-scroll {
     font-size: 14px;
-    color: #aaa;
 }
 
-/* DOS DADOS */
+/* DADOS */
 
 .contenedor-dados {
     display: flex;
@@ -196,7 +189,7 @@ p {
     width: 100%;
     max-width: 360px;
     margin: 25px 0;
-    padding: 12px;
+    padding: 16px;
 }
 
 .contenedor-dados .dado {
@@ -204,13 +197,21 @@ p {
     width: calc((100% - 24px) / 2);
     max-width: 130px;
     height: auto;
+
     object-fit: contain;
     transform-origin: center;
+
+    user-select: none;
+    -webkit-user-select: none;
 }
 
-/* MICRÓFONO */
+/* BOTONES */
 
-#activar-microfono {
+#activar-microfono,
+#activar-movimiento {
+    appearance: none;
+    -webkit-appearance: none;
+
     padding: 12px 20px;
     border: none;
     border-radius: 12px;
@@ -221,31 +222,29 @@ p {
     font: inherit;
     font-weight: bold;
     cursor: pointer;
+
+    touch-action: manipulation;
 }
 
-#activar-microfono:disabled {
-    opacity: 0.6;
-    cursor: wait;
-}
-
-#activar-microfono:focus-visible {
+#activar-microfono:focus-visible,
+#activar-movimiento:focus-visible {
     outline: 3px solid white;
     outline-offset: 4px;
 }
 
-#estado-microfono {
+/* ESTADOS E INDICADORES */
+
+#estado-microfono,
+#estado-movimiento {
     font-size: 15px;
 }
 
-#nivel-soplido {
+#nivel-soplido,
+#nivel-sacudida {
     width: 200px;
     max-width: 80%;
     height: 18px;
     margin-top: 8px;
-}
-
-.nota-microfono {
-    font-size: 13px;
 }
 
 /* CELULARES */
