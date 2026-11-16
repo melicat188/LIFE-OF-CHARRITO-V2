@@ -52,14 +52,13 @@ p {
     font-size: 14px;
 }
 
-/* IMAGEN DE CHARRITO */
+/* CHARRITO */
 
 .contenedor-imagen {
     width: 80%;
     max-width: 600px;
     height: 350px;
     margin-top: 30px;
-
     border-radius: 20px;
     overflow: hidden;
     background-color: #222;
@@ -93,7 +92,6 @@ p {
     height: auto;
     aspect-ratio: 1;
     object-fit: contain;
-
     transition: transform 0.3s ease;
 }
 
@@ -118,12 +116,7 @@ p {
     height: 100svh;
     min-height: 0;
 
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
     gap: 12px;
-
     padding: 16px 20px;
     background-color: black;
 }
@@ -153,11 +146,9 @@ p {
     height: min(260px, 70vw, 38svh);
 
     flex: 0 0 auto;
-
     touch-action: none;
     user-select: none;
     -webkit-user-select: none;
-
     cursor: grab;
 }
 
@@ -202,54 +193,45 @@ p {
     width: calc((100% - 30px) / 2);
     max-width: 120px;
     height: auto;
-
     object-fit: contain;
     transform-origin: center;
-
     user-select: none;
     -webkit-user-select: none;
 }
 
-/* BOTONES */
+/* CONTROLES COMPARTIDOS */
 
-#activar-microfono,
-#activar-movimiento {
+.boton-control {
     appearance: none;
     -webkit-appearance: none;
 
     padding: 12px 20px;
     border: none;
     border-radius: 12px;
-
     background-color: #80e88a;
     color: #111;
 
     font: inherit;
     font-weight: bold;
     cursor: pointer;
-
     touch-action: manipulation;
 }
 
-#activar-microfono:focus-visible,
-#activar-movimiento:focus-visible {
+.boton-control:focus-visible {
     outline: 3px solid white;
     outline-offset: 4px;
 }
 
-/* ESTADOS E INDICADORES */
-
-#estado-microfono,
-#estado-movimiento {
+.estado-control {
     font-size: 15px;
 }
 
-#nivel-soplido,
-#nivel-sacudida {
+.medidor-control {
+    display: block;
     width: 220px;
-    max-width: 80%;
+    max-width: 100%;
     height: 20px;
-    margin-top: 8px;
+    margin: 8px auto 0;
 }
 
 /* CELULARES */
@@ -314,4 +296,3 @@ p {
         transition: none;
     }
 }
-

@@ -126,7 +126,6 @@ document.querySelectorAll(".ruleta").forEach((contenedor) => {
         }
 
         let diferencia = anguloActual - anguloAnterior;
-
         diferencia = ((diferencia + 540) % 360) - 180;
 
         const tiempo = Math.max(ahora - tiempoAnterior, 1);
@@ -227,7 +226,7 @@ document.querySelectorAll(".ruleta").forEach((contenedor) => {
 });
 
 /* =========================================
-   DADOS PARA SOPLAR
+   MICRÓFONO
 ========================================= */
 
 (() => {
@@ -290,7 +289,6 @@ document.querySelectorAll(".ruleta").forEach((contenedor) => {
         boton.disabled = false;
         boton.textContent = "Activar micrófono";
         boton.setAttribute("aria-pressed", "false");
-
         estado.textContent = mensaje;
     }
 
@@ -396,7 +394,7 @@ document.querySelectorAll(".ruleta").forEach((contenedor) => {
             boton.setAttribute("aria-pressed", "true");
 
             estado.textContent = preferenciaMovimiento.matches
-                ? "Micrófono activo. La animación está desactivada por tu preferencia de movimiento reducido; observa la barra."
+                ? "Micrófono activo. Movimiento reducido activado: observa la barra."
                 : "Micrófono activo. ¡Sopla para mover los dados!";
 
             flujo.getAudioTracks().forEach((pista) => {
@@ -449,293 +447,337 @@ document.querySelectorAll(".ruleta").forEach((contenedor) => {
 })();
 
 /* =========================================
-   DADOS PARA SACUDIR
+   TRES SECCIONES DE SACUDIDA
 ========================================= */
 
 (() => {
-    const boton = document.getElementById("activar-movimiento");
-    const estado = document.getElementById("estado-movimiento");
-    const nota = document.getElementById("nota-movimiento");
-    const medidor = document.getElementById("nivel-sacudida");
-    const dados = document.querySelectorAll("#dados-sacudida .dado");
+    // Solo una sección puede usar el movimiento a la vez.
+    let detenerSeccionActual = null;
 
-    if (!boton || !estado || !medidor || !dados.length) return;
+    document.querySelectorAll(".seccion-sacudida").forEach((seccion) => {
+        // Cada búsqueda se limita a esta sección.
+        const boton = seccion.querySelector(".activar-movimiento");
+        const estado = seccion.querySelector(".estado-movimiento");
+        const nota = seccion.querySelector(".nota-movimiento");
+        const medidor = seccion.querySelector(".nivel-sacudida");
+        const dados = seccion.querySelectorAll(".dado");
 
-    let activo = false;
-    let iniciando = false;
-    let version = 0;
+        if (!boton || !estado || !medidor || !dados.length) return;
 
-    let animacion = null;
-    let temporizador = null;
+        let activo = false;
+        let iniciando = false;
+        let version = 0;
 
-    let intensidad = 0;
-    let ultimoFrame = 0;
-    let ultimaLectura = null;
-    let gravedad = null;
-    let datosRecibidos = false;
+        let animacion = null;
+        let temporizador = null;
 
-    // Mayor sensibilidad que la versión anterior.
-    const UMBRAL_SACUDIDA = 0.3;
-    const FUERZA_MAXIMA = 5;
+        let intensidad = 0;
+        let ultimoFrame = null;
+        let ultimaLectura = null;
+        let gravedad = null;
+        let datosRecibidos = false;
 
-    function actualizarNota() {
-        if (!nota) return;
+        const UMBRAL_SACUDIDA = 0.3;
+        const FUERZA_MAXIMA = 5;
 
-        nota.textContent = preferenciaMovimiento.matches
-            ? "Tu celular indica una preferencia de movimiento reducido. La barra funciona, pero la animación de los dados está desactivada."
-            : "";
-    }
+        function actualizarNota() {
+            if (!nota) return;
 
-    actualizarNota();
+            nota.textContent = preferenciaMovimiento.matches
+                ? "Movimiento reducido activado: la barra funciona, pero la animación de los dados está desactivada."
+                : "";
+        }
 
-    preferenciaMovimiento.addEventListener("change", () => {
         actualizarNota();
 
-        if (preferenciaMovimiento.matches) {
-            restablecerDados(dados);
-        }
-    });
+        preferenciaMovimiento.addEventListener("change", () => {
+            actualizarNota();
 
-    function detenerMovimiento(
-        mensaje = "El sensor de movimiento está apagado."
-    ) {
-        version += 1;
-        activo = false;
-        iniciando = false;
-
-        window.removeEventListener(
-            "devicemotion",
-            detectarMovimiento
-        );
-
-        clearTimeout(temporizador);
-        temporizador = null;
-
-        if (animacion !== null) {
-            cancelAnimationFrame(animacion);
-            animacion = null;
-        }
-
-        intensidad = 0;
-        ultimoFrame = 0;
-        ultimaLectura = null;
-        gravedad = null;
-        datosRecibidos = false;
-
-        medidor.value = 0;
-        restablecerDados(dados);
-
-        boton.disabled = false;
-        boton.textContent = "Activar movimiento";
-        boton.setAttribute("aria-pressed", "false");
-
-        estado.textContent = mensaje;
-    }
-
-    function tieneCoordenadas(vector) {
-        return vector &&
-            Number.isFinite(vector.x) &&
-            Number.isFinite(vector.y) &&
-            Number.isFinite(vector.z);
-    }
-
-    function detectarMovimiento(evento) {
-        if (!activo) return;
-
-        const ahora = performance.now();
-
-        let vector = evento.acceleration;
-        let fuerza = 0;
-
-        if (tieneCoordenadas(vector)) {
-            // Aceleración sin gravedad.
-            fuerza = Math.hypot(vector.x, vector.y, vector.z);
-        } else {
-            // Respaldo para sensores que incluyen gravedad.
-            vector = evento.accelerationIncludingGravity;
-
-            if (!tieneCoordenadas(vector)) return;
-
-            if (!gravedad) {
-                gravedad = {
-                    x: vector.x,
-                    y: vector.y,
-                    z: vector.z
-                };
+            if (preferenciaMovimiento.matches) {
+                restablecerDados(dados);
             }
+        });
 
-            const tiempo = ultimaLectura === null
-                ? 16.67
-                : Math.min(ahora - ultimaLectura, 100);
+        function estaVisible() {
+            const limites = seccion.getBoundingClientRect();
 
-            const filtro = Math.exp(-tiempo / 250);
-
-            gravedad.x =
-                filtro * gravedad.x + (1 - filtro) * vector.x;
-
-            gravedad.y =
-                filtro * gravedad.y + (1 - filtro) * vector.y;
-
-            gravedad.z =
-                filtro * gravedad.z + (1 - filtro) * vector.z;
-
-            fuerza = Math.hypot(
-                vector.x - gravedad.x,
-                vector.y - gravedad.y,
-                vector.z - gravedad.z
-            );
+            return limites.bottom > 0 &&
+                limites.top < window.innerHeight;
         }
 
-        ultimaLectura = ahora;
+        function detenerMovimiento(
+            mensaje = "El sensor de movimiento está apagado."
+        ) {
+            version += 1;
+            activo = false;
+            iniciando = false;
 
-        if (!datosRecibidos) {
-            datosRecibidos = true;
+            window.removeEventListener(
+                "devicemotion",
+                detectarMovimiento
+            );
 
             clearTimeout(temporizador);
             temporizador = null;
 
-            estado.textContent =
-                "¡Sensor listo! Sacude suavemente el celular y observa la barra.";
-        }
+            if (animacion !== null) {
+                cancelAnimationFrame(animacion);
+                animacion = null;
+            }
 
-        const nuevaIntensidad = Math.max(
-            0,
-            Math.min(
-                1,
-                (fuerza - UMBRAL_SACUDIDA) /
-                (FUERZA_MAXIMA - UMBRAL_SACUDIDA)
-            )
-        );
-
-        intensidad = Math.max(intensidad, nuevaIntensidad);
-    }
-
-    function animarDados(ahora) {
-        if (!activo) return;
-
-        const tiempo = ultimoFrame
-            ? Math.min(ahora - ultimoFrame, 50)
-            : 16.67;
-
-        ultimoFrame = ahora;
-
-        medidor.value = intensidad;
-
-        // Movimiento más visible: hasta 20 px.
-        moverDados(dados, intensidad, ahora, 20);
-
-        // Vuelve suavemente al reposo.
-        intensidad *= Math.exp(-tiempo / 300);
-
-        if (intensidad < 0.001) {
             intensidad = 0;
+            ultimoFrame = null;
+            ultimaLectura = null;
+            gravedad = null;
+            datosRecibidos = false;
+
+            medidor.value = 0;
+            restablecerDados(dados);
+
+            boton.disabled = false;
+            boton.textContent = "Activar movimiento";
+            boton.setAttribute("aria-pressed", "false");
+
+            estado.textContent = mensaje;
+
+            if (detenerSeccionActual === detenerMovimiento) {
+                detenerSeccionActual = null;
+            }
         }
 
-        animacion = requestAnimationFrame(animarDados);
-    }
-
-    async function activarMovimiento() {
-        if (activo || iniciando) return;
-
-        if (!window.isSecureContext) {
-            estado.textContent =
-                "Abre la página mediante HTTPS para usar el movimiento.";
-            return;
+        function tieneCoordenadas(vector) {
+            return vector &&
+                Number.isFinite(vector.x) &&
+                Number.isFinite(vector.y) &&
+                Number.isFinite(vector.z);
         }
 
-        const SensorMovimiento = window.DeviceMotionEvent;
+        function detectarMovimiento(evento) {
+            if (!activo) return;
 
-        if (!SensorMovimiento) {
-            estado.textContent =
-                "Este navegador no ofrece acceso al sensor de movimiento.";
-            return;
-        }
+            if (!estaVisible()) {
+                detenerMovimiento();
+                return;
+            }
 
-        const solicitud = ++version;
+            const ahora = performance.now();
 
-        iniciando = true;
+            let vector = evento.acceleration;
+            let fuerza = 0;
 
-        // El botón nunca queda bloqueado.
-        boton.disabled = false;
-        boton.textContent = "Cancelar activación";
+            if (tieneCoordenadas(vector)) {
+                fuerza = Math.hypot(vector.x, vector.y, vector.z);
+            } else {
+                vector = evento.accelerationIncludingGravity;
 
-        estado.textContent = "Activando el sensor…";
+                if (!tieneCoordenadas(vector)) return;
 
-        temporizador = setTimeout(() => {
-            if (solicitud === version && !datosRecibidos) {
-                detenerMovimiento(
-                    "No se recibieron datos. Permite los sensores de movimiento en los ajustes del sitio y abre el enlace directamente en Chrome o Safari."
+                if (!gravedad) {
+                    gravedad = {
+                        x: vector.x,
+                        y: vector.y,
+                        z: vector.z
+                    };
+                }
+
+                const tiempo = ultimaLectura === null
+                    ? 16.67
+                    : Math.min(ahora - ultimaLectura, 100);
+
+                const filtro = Math.exp(-tiempo / 250);
+
+                gravedad.x =
+                    filtro * gravedad.x + (1 - filtro) * vector.x;
+
+                gravedad.y =
+                    filtro * gravedad.y + (1 - filtro) * vector.y;
+
+                gravedad.z =
+                    filtro * gravedad.z + (1 - filtro) * vector.z;
+
+                fuerza = Math.hypot(
+                    vector.x - gravedad.x,
+                    vector.y - gravedad.y,
+                    vector.z - gravedad.z
                 );
             }
-        }, 10000);
 
-        try {
-            // En Android normalmente no se necesita esta solicitud.
-            // Safari en iPhone sí puede exigirla.
-            if (
-                typeof SensorMovimiento.requestPermission === "function"
-            ) {
-                const permiso =
-                    await SensorMovimiento.requestPermission();
+            ultimaLectura = ahora;
+
+            if (!datosRecibidos) {
+                datosRecibidos = true;
+
+                clearTimeout(temporizador);
+                temporizador = null;
+
+                estado.textContent =
+                    "¡Sensor listo! Sacude suavemente el celular.";
+            }
+
+            const nuevaIntensidad = Math.max(
+                0,
+                Math.min(
+                    1,
+                    (fuerza - UMBRAL_SACUDIDA) /
+                    (FUERZA_MAXIMA - UMBRAL_SACUDIDA)
+                )
+            );
+
+            intensidad = Math.max(intensidad, nuevaIntensidad);
+        }
+
+        function animarDados(ahora) {
+            if (!activo) return;
+
+            if (!estaVisible()) {
+                detenerMovimiento();
+                return;
+            }
+
+            const tiempo = ultimoFrame === null
+                ? 16.67
+                : Math.min(ahora - ultimoFrame, 50);
+
+            ultimoFrame = ahora;
+
+            medidor.value = intensidad;
+            moverDados(dados, intensidad, ahora, 20);
+
+            intensidad *= Math.exp(-tiempo / 300);
+
+            if (intensidad < 0.001) intensidad = 0;
+
+            animacion = requestAnimationFrame(animarDados);
+        }
+
+        async function activarMovimiento() {
+            if (activo || iniciando || !estaVisible()) return;
+
+            if (!window.isSecureContext) {
+                estado.textContent =
+                    "Abre la página mediante HTTPS para usar el movimiento.";
+                return;
+            }
+
+            const SensorMovimiento = window.DeviceMotionEvent;
+
+            if (!SensorMovimiento) {
+                estado.textContent =
+                    "Este navegador no ofrece acceso al sensor de movimiento.";
+                return;
+            }
+
+            // Desactiva cualquier otra tirada, incluso si pedía permiso.
+            if (detenerSeccionActual) {
+                detenerSeccionActual();
+            }
+
+            detenerSeccionActual = detenerMovimiento;
+
+            const solicitud = ++version;
+
+            iniciando = true;
+            boton.disabled = false;
+            boton.textContent = "Cancelar activación";
+            estado.textContent = "Activando el sensor…";
+
+            temporizador = setTimeout(() => {
+                if (solicitud === version && !datosRecibidos) {
+                    detenerMovimiento(
+                        "No se recibieron datos. Revisa el permiso de sensores de movimiento y abre el enlace directamente en Chrome o Safari."
+                    );
+                }
+            }, 10000);
+
+            try {
+                if (
+                    typeof SensorMovimiento.requestPermission === "function"
+                ) {
+                    const permiso =
+                        await SensorMovimiento.requestPermission();
+
+                    if (solicitud !== version) return;
+
+                    if (permiso !== "granted") {
+                        detenerMovimiento(
+                            "Permite el movimiento en los ajustes de este sitio."
+                        );
+                        return;
+                    }
+                }
 
                 if (solicitud !== version) return;
 
-                if (permiso !== "granted") {
-                    detenerMovimiento(
-                        "El permiso fue rechazado. Permite el movimiento en los ajustes del sitio."
-                    );
+                if (document.hidden || !estaVisible()) {
+                    detenerMovimiento();
                     return;
                 }
+
+                activo = true;
+                iniciando = false;
+
+                intensidad = 0;
+                gravedad = null;
+                ultimaLectura = null;
+                ultimoFrame = null;
+                datosRecibidos = false;
+
+                boton.textContent = "Apagar movimiento";
+                boton.setAttribute("aria-pressed", "true");
+
+                estado.textContent =
+                    "Esperando datos. Mueve suavemente el celular.";
+
+                window.addEventListener(
+                    "devicemotion",
+                    detectarMovimiento,
+                    { passive: true }
+                );
+
+                animacion = requestAnimationFrame(animarDados);
+            } catch (error) {
+                if (solicitud !== version) return;
+
+                detenerMovimiento(
+                    "No se pudo activar el sensor. Revisa los permisos del navegador."
+                );
             }
-
-            if (solicitud !== version) return;
-
-            activo = true;
-            iniciando = false;
-
-            intensidad = 0;
-            gravedad = null;
-            ultimaLectura = null;
-            ultimoFrame = 0;
-            datosRecibidos = false;
-
-            boton.textContent = "Apagar movimiento";
-            boton.setAttribute("aria-pressed", "true");
-
-            estado.textContent =
-                "Esperando datos. Mueve suavemente el celular.";
-
-            window.addEventListener(
-                "devicemotion",
-                detectarMovimiento,
-                { passive: true }
-            );
-
-            animacion = requestAnimationFrame(animarDados);
-        } catch (error) {
-            if (solicitud !== version) return;
-
-            detenerMovimiento(
-                "No se pudo activar el sensor. Revisa los permisos de movimiento del navegador."
-            );
         }
-    }
 
-    boton.disabled = false;
+        boton.disabled = false;
 
-    boton.addEventListener("click", () => {
-        if (activo || iniciando) {
+        boton.addEventListener("click", () => {
+            if (activo || iniciando) {
+                detenerMovimiento();
+            } else {
+                activarMovimiento();
+            }
+        });
+
+        // Desactiva esta tirada cuando sale completamente de pantalla.
+        if ("IntersectionObserver" in window) {
+            const observador = new IntersectionObserver((entradas) => {
+                for (const entrada of entradas) {
+                    if (
+                        !entrada.isIntersecting &&
+                        (activo || iniciando)
+                    ) {
+                        detenerMovimiento();
+                    }
+                }
+            });
+
+            observador.observe(seccion);
+        }
+
+        document.addEventListener("visibilitychange", () => {
+            if (document.hidden && (activo || iniciando)) {
+                detenerMovimiento();
+            }
+        });
+
+        window.addEventListener("pagehide", () => {
             detenerMovimiento();
-        } else {
-            activarMovimiento();
-        }
+        });
     });
-
-    document.addEventListener("visibilitychange", () => {
-        if (document.hidden && (activo || iniciando)) {
-            detenerMovimiento();
-        }
-    });
-
-    window.addEventListener("pagehide", () => detenerMovimiento());
 })();

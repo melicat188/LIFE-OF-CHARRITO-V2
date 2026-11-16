@@ -6,8 +6,8 @@
 
     <title>Life of Charrito</title>
 
-    <link rel="stylesheet" href="style.css?v=6">
-    <script src="script.js?v=6" defer></script>
+    <link rel="stylesheet" href="style.css?v=7">
+    <script src="script.js?v=7" defer></script>
 </head>
 
 <body>
@@ -166,7 +166,7 @@
         </p>
     </section>
 
-    <!-- DADOS QUE REACCIONAN AL SOPLIDO -->
+    <!-- DADOS PARA SOPLAR -->
 
     <section id="seccion-soplido">
         <h1>Sopla los dados por el buen augurio</h1>
@@ -191,127 +191,207 @@
 
         <button
             id="activar-microfono"
+            class="boton-control"
             type="button"
             aria-pressed="false"
         >
             Activar micrófono
         </button>
 
-        <p id="estado-microfono" role="status">
+        <p id="estado-microfono" class="estado-control" role="status">
             El micrófono está apagado.
         </p>
 
         <label for="nivel-soplido">Volumen del micrófono</label>
-        <meter id="nivel-soplido" min="0" max="1" value="0"></meter>
+
+        <meter
+            id="nivel-soplido"
+            class="medidor-control"
+            min="0"
+            max="1"
+            value="0"
+        ></meter>
     </section>
 
-    <!-- DADOS QUE REACCIONAN AL MOVIMIENTO -->
+    <!-- PRIMERA SACUDIDA -->
 
-    <section id="seccion-sacudida">
+    <section class="seccion-sacudida">
         <h1>Debes sacudir para tirar...</h1>
 
         <p>
             Toca “Activar movimiento” y sacude suavemente tu celular.
         </p>
 
-        <div class="contenedor-dados" id="dados-sacudida">
+        <div class="contenedor-dados">
             <img
                 class="dado"
                 src="assets/dado.png"
-                alt="Primer dado para sacudir"
+                alt="Primer dado de la primera tirada"
                 draggable="false"
             >
 
             <img
                 class="dado"
                 src="assets/dado.png"
-                alt="Segundo dado para sacudir"
+                alt="Segundo dado de la primera tirada"
                 draggable="false"
             >
         </div>
 
         <button
-            id="activar-movimiento"
+            class="activar-movimiento boton-control"
             type="button"
             aria-pressed="false"
         >
             Activar movimiento
         </button>
 
-        <p id="estado-movimiento" role="status">
+        <p class="estado-movimiento estado-control" role="status">
             El sensor de movimiento está apagado.
         </p>
 
-        <label for="nivel-sacudida">Intensidad del movimiento</label>
-        <meter id="nivel-sacudida" min="0" max="1" value="0"></meter>
+        <label>
+            Intensidad del movimiento
+            <meter
+                class="nivel-sacudida medidor-control"
+                min="0"
+                max="1"
+                value="0"
+            ></meter>
+        </label>
 
-        <p class="nota" id="nota-movimiento"></p>
+        <p class="nota nota-movimiento"></p>
     </section>
 
     <section>
-<h1>
-    No le logras ganar al celador...Charrito voltea a mirarte...y te dice: </h1>
+        <h1>
+            No le logras ganar al celador...
+            Charrito voltea a mirarte y te dice:
+        </h1>
 
-    <p>"Compa... yo... tuve serios problemas con las adicciones, apuestas, vicios...</p>
-    </section>
-    
-            <section>
-    <h1> "Debo ser fuerte para no recaer en ello...</h1>
-    <p> Por favor...ayúdeme compita, el que no arriesga no gana"</p>
+        <p>
+            “Compa... yo... tuve serios problemas
+            con las adicciones, apuestas, vicios...”
+        </p>
     </section>
 
     <section>
-    <h1>Desde ahora, cada tirada de dados vale dos gemas</h1> 
-    <p>Sabes que el celador es un estafador, pero de verdad quieres ayudar a Charrito. </p>
+        <h1>“Debo ser fuerte para no recaer en ello...</h1>
+
+        <p>
+            Por favor... ayúdeme compita,
+            el que no arriesga no gana”.
+        </p>
     </section>
 
-    <secion>
+    <section>
+        <h1>Desde ahora, cada tirada de dados vale dos gemas</h1>
+
+        <p>
+            Sabes que el celador es un estafador,
+            pero de verdad quieres ayudar a Charrito.
+        </p>
+    </section>
+
+    <section>
         <h1>Decides tirar de nuevo</h1>
-    </secion>
+    </section>
 
-     <section id="seccion-sacudida">
-        <h1>Debes sacudir para tirar...</h1>
+    <!-- SEGUNDA SACUDIDA -->
 
-        <p>
-            Toca “Activar movimiento” y sacude suavemente tu celular.
-        </p>
+    <section class="seccion-sacudida">
+        <h1>Segunda tirada</h1>
 
-        <div class="contenedor-dados" id="dados-sacudida">
+        <p>Activa el movimiento y vuelve a sacudir el celular.</p>
+
+        <div class="contenedor-dados">
             <img
                 class="dado"
                 src="assets/dado.png"
-                alt="Primer dado para sacudir"
+                alt="Primer dado de la segunda tirada"
                 draggable="false"
             >
 
             <img
                 class="dado"
                 src="assets/dado.png"
-                alt="Segundo dado para sacudir"
+                alt="Segundo dado de la segunda tirada"
                 draggable="false"
             >
         </div>
 
         <button
-            id="activar-movimiento"
+            class="activar-movimiento boton-control"
             type="button"
             aria-pressed="false"
         >
             Activar movimiento
         </button>
 
-        <p id="estado-movimiento" role="status">
+        <p class="estado-movimiento estado-control" role="status">
             El sensor de movimiento está apagado.
         </p>
 
-        <label for="nivel-sacudida">Intensidad del movimiento</label>
-        <meter id="nivel-sacudida" min="0" max="1" value="0"></meter>
+        <label>
+            Intensidad del movimiento
+            <meter
+                class="nivel-sacudida medidor-control"
+                min="0"
+                max="1"
+                value="0"
+            ></meter>
+        </label>
 
-        <p class="nota" id="nota-movimiento"></p>
+        <p class="nota nota-movimiento"></p>
     </section>
 
+    <!-- TERCERA SACUDIDA -->
 
+    <section class="seccion-sacudida">
+        <h1>Tercera tirada</h1>
 
+        <p>Activa el movimiento y sacude una vez más.</p>
+
+        <div class="contenedor-dados">
+            <img
+                class="dado"
+                src="assets/dado.png"
+                alt="Primer dado de la tercera tirada"
+                draggable="false"
+            >
+
+            <img
+                class="dado"
+                src="assets/dado.png"
+                alt="Segundo dado de la tercera tirada"
+                draggable="false"
+            >
+        </div>
+
+        <button
+            class="activar-movimiento boton-control"
+            type="button"
+            aria-pressed="false"
+        >
+            Activar movimiento
+        </button>
+
+        <p class="estado-movimiento estado-control" role="status">
+            El sensor de movimiento está apagado.
+        </p>
+
+        <label>
+            Intensidad del movimiento
+            <meter
+                class="nivel-sacudida medidor-control"
+                min="0"
+                max="1"
+                value="0"
+            ></meter>
+        </label>
+
+        <p class="nota nota-movimiento"></p>
+    </section>
 
     <section>
         <h1>NOO NO PUEDE SER</h1>
