@@ -3,20 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Life of Charrito</title>
 
     <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
 </head>
 
 <body>
-
-    <!-- Primera sección -->
     <section>
         <h1>Life of Charrito</h1>
         <p>desliza ↓</p>
     </section>
 
-    <!-- Segunda sección -->
     <section>
         <h1>Este es Charrito</h1>
 
@@ -30,7 +29,6 @@
         </div>
     </section>
 
-    <!-- Tercera sección -->
     <section>
         <div class="contenedor-verdes">
             <img src="assets/image.png" alt="Gema verde 1">
@@ -40,11 +38,10 @@
 
         <h1>En su última aventura,</h1>
 
-
         <p>
             Charrito salvó a la princesa del reino
-            de Sincelejo de las adicciones, y pudo recolectar una recompensa
-            con la que el rey le agradeció.
+            de Sincelejo de las adicciones y pudo recolectar
+            una recompensa con la que el rey le agradeció.
         </p>
 
         <p>
@@ -53,44 +50,58 @@
     </section>
 
     <section>
+        <h1>Primer trial</h1>
 
-<h1>Primer trial </h1>
-
-<p>Charrito debe pagar por una informacion que lo lleve al paradero del malvado borracho apostador.</p>
-
+        <p>
+            Charrito debe pagar por una información que lo lleve
+            al paradero del malvado borracho apostador.
+        </p>
     </section>
 
- <section>
+    <section>
+        <h1>PERO</h1>
 
-<h1>PERO</h1>
-
-<p>Solo tenemos 3 gemas...Charrito sabe que necesitará mas gemas para llegar a el...</p>
-
+        <p>
+            Solo tenemos 3 gemas...
+            Charrito sabe que necesitará más gemas para llegar a él...
+        </p>
     </section>
 
-<section>
+    <!-- Este contenedor determina cuánto dura la pausa. -->
+    <div class="tramo-pausa">
+        <section class="seccion-fija">
+            <h1>GIRA LA RULETA</h1>
 
-<h1>GIRA LA RULETA</h1>
+            <p>
+                Arrastra la ruleta para girarla.
+                También puedes seleccionarla y usar las flechas del teclado.
+            </p>
 
-<div id="ruleta">
-            <img src="assets/ruleta.png">
-        </div>
+            <div id="ruleta">
+                <img
+                    id="imagen-ruleta"
+                    src="assets/ruleta.png"
+                    alt="Ruleta: usa las flechas izquierda y derecha para girarla"
+                    tabindex="0"
+                    draggable="false"
+                >
+            </div>
 
-    </section>
+            <p class="indicacion-scroll">Sigue deslizando para continuar ↓</p>
+        </section>
+    </div>
 
-    <!-- Cuarta sección -->
     <section>
         <h1>NOO NO PUEDE SER</h1>
 
         <p>
-            a charrito le encontraron nexos
-            con el clan del golfo
+            A Charrito le encontraron nexos
+            con el Clan del Golfo.
         </p>
 
         <p>
-            esta preso en la carcel de Sincelejo
+            Está preso en la cárcel de Sincelejo.
         </p>
     </section>
-
 </body>
 </html>

@@ -1,5 +1,8 @@
-
 /* CONFIGURACIÓN GENERAL */
+
+* {
+    box-sizing: border-box;
+}
 
 html {
     scroll-behavior: smooth;
@@ -18,19 +21,19 @@ body {
 
 section {
     min-height: 100vh;
+    min-height: 100svh;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     padding: 30px 20px;
-    box-sizing: border-box;
 }
 
 /* TÍTULOS */
 
 h1 {
     font-size: 60px;
-    margin-bottom: 20px;
+    margin: 0 0 20px;
 }
 
 /* PÁRRAFOS */
@@ -55,6 +58,7 @@ p {
 }
 
 .contenedor-imagen img {
+    display: block;
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -77,10 +81,72 @@ p {
     transition: transform 0.3s ease;
 }
 
-/* EFECTO AL PASAR EL MOUSE */
-
 .contenedor-verdes img:hover {
     transform: scale(1.2);
+}
+
+/* SECCIÓN FIJA DURANTE EL SCROLL */
+
+/*
+   200svh deja un tramo adicional de una pantalla para deslizar
+   mientras la sección permanece fija.
+*/
+.tramo-pausa {
+    height: 200vh;
+    height: 200svh;
+}
+
+.seccion-fija {
+    position: sticky;
+    top: 0;
+
+    height: 100vh;
+    height: 100svh;
+    min-height: 0;
+
+    background-color: black;
+}
+
+/* RULETA */
+
+#ruleta {
+    width: 400px;
+
+    /* Reserva espacio para los textos en pantallas bajas. */
+    max-width: min(100%, 45vh);
+    max-width: min(100%, 45svh);
+
+    aspect-ratio: 1;
+    flex-shrink: 0;
+
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+
+    cursor: grab;
+}
+
+#ruleta.arrastrando {
+    cursor: grabbing;
+}
+
+#imagen-ruleta {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transform-origin: center;
+}
+
+#imagen-ruleta:focus-visible {
+    outline: 3px solid #80e88a;
+    outline-offset: 6px;
+    border-radius: 50%;
+}
+
+.indicacion-scroll {
+    font-size: 15px;
+    color: #888;
 }
 
 /* ADAPTACIÓN PARA CELULARES */
@@ -103,16 +169,39 @@ p {
         width: 120px;
         height: 120px;
     }
+
+    .contenedor-verdes {
+        gap: 15px;
+    }
+
+    .indicacion-scroll {
+        font-size: 14px;
+    }
 }
 
+/* Permite leer todo el contenido en pantallas muy bajas. */
 
-#ruleta {
-    width: 400px;
-    height: 400px;
-    max-width: 100%;
+@media (max-height: 600px) {
+    .seccion-fija {
+        position: relative;
+        height: auto;
+        min-height: 100vh;
+        min-height: 100svh;
+    }
+
+    .tramo-pausa {
+        height: auto;
+    }
 }
 
-#ruleta img{
-    width: 100%;
-    height: 100%;
+/* PREFERENCIA DE MOVIMIENTO REDUCIDO */
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    .contenedor-verdes img {
+        transition: none;
+    }
 }

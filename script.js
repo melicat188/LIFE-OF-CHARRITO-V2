@@ -40,12 +40,10 @@ contenedor.addEventListener("pointerdown", (evento) => {
         return;
     }
 
-    // Evita acciones del navegador al tocar la ruleta.
     evento.preventDefault();
-
     detenerInercia();
 
-    const limites = contenedor.getBoundingClientRect();
+    const limites = imagen.getBoundingClientRect();
 
     centroX = limites.left + limites.width / 2;
     centroY = limites.top + limites.height / 2;
@@ -54,6 +52,8 @@ contenedor.addEventListener("pointerdown", (evento) => {
     anguloAnterior = obtenerAngulo(evento);
     tiempoAnterior = performance.now();
     ultimoMovimiento = tiempoAnterior;
+
+    imagen.focus({ preventScroll: true });
 
     contenedor.classList.add("arrastrando");
     contenedor.setPointerCapture(evento.pointerId);
@@ -119,8 +119,10 @@ function iniciarInercia() {
 function terminarArrastre(evento, usarInercia) {
     if (evento.pointerId !== punteroActivo) return;
 
-    // Se limpia antes de liberar la captura para evitar duplicados.
+    // Limpia el estado antes de liberar la captura.
     punteroActivo = null;
+    anguloAnterior = null;
+
     contenedor.classList.remove("arrastrando");
 
     if (contenedor.hasPointerCapture(evento.pointerId)) {
@@ -156,7 +158,7 @@ contenedor.addEventListener("lostpointercapture", (evento) => {
     terminarArrastre(evento, false);
 });
 
-// Impide arrastrar el archivo de imagen con el mouse.
+// Impide arrastrar el archivo de imagen.
 imagen.addEventListener("dragstart", (evento) => {
     evento.preventDefault();
 });
