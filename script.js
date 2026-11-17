@@ -19,42 +19,40 @@
 
         dados.forEach((dado, indice) => {
             const fase = indice * 2.4;
+            const x = Math.sin(ahora * 0.035 + fase) * intensidad * amplitud;
+            const y = Math.cos(ahora * 0.029 + fase) * intensidad * amplitud * 0.75;
+            const giro = Math.sin(ahora * 0.025 + fase) * intensidad * amplitud * 1.5;
 
-            const x =
-                Math.sin(ahora * 0.035 + fase) *
-                intensidad * amplitud;
-
-            const y =
-                Math.cos(ahora * 0.029 + fase) *
-                intensidad * amplitud * 0.75;
-
-            const giro =
-                Math.sin(ahora * 0.025 + fase) *
-                intensidad * amplitud * 1.5;
-
-            dado.style.transform =
-                `translate(${x}px, ${y}px) rotate(${giro}deg)`;
+            dado.style.transform = `translate(${x}px, ${y}px) rotate(${giro}deg)`;
         });
     }
 
     function estaVisible(elemento) {
         const limites = elemento.getBoundingClientRect();
-
-        return limites.bottom > 0 &&
-            limites.top < window.innerHeight;
+        return limites.bottom > 0 && limites.top < window.innerHeight;
     }
 
-    /* =====================================
-       RULETAS
-    ===================================== */
+    /* RULETAS */
+
+    const dialogoRuleta = document.getElementById("resultado-ruleta");
+    const tituloResultado = document.getElementById("titulo-resultado-ruleta");
+    const gemasResultado = document.getElementById("gemas-resultado-ruleta");
+
+    const resultadosRuleta = {
+        perdida: { mensaje: "Pierdes dos gemas", cantidad: 1, etiqueta: "Una gema" },
+        ganancia: { mensaje: "Ganaste cinco gemas", cantidad: 5, etiqueta: "Cinco gemas" }
+    };
 
     document.querySelectorAll(".ruleta").forEach((contenedor) => {
         const imagen = contenedor.querySelector(".imagen-ruleta");
-
         if (!imagen) return;
 
+        const resultado = resultadosRuleta[contenedor.dataset.resultado];
+        let resultadoMostrado = false;
+        let temporizadorTeclado = null;
         let rotacion = 0;
         let velocidad = 0;
+        let giroAcumulado = 0;
         let punteroActivo = null;
         let anguloAnterior = null;
         let tiempoAnterior = 0;
@@ -67,18 +65,41 @@
             imagen.style.transform = `rotate(${rotacion}deg)`;
         }
 
-        function detenerInercia() {
-            if (animacion !== null) {
-                cancelAnimationFrame(animacion);
+        function mostrarResultado() {
+            if (
+                resultadoMostrado ||
+                !resultado ||
+                typeof dialogoRuleta?.showModal !== "function" ||
+                !tituloResultado ||
+                !gemasResultado ||
+                dialogoRuleta.open
+            ) {
+                return;
             }
 
+            tituloResultado.textContent = resultado.mensaje;
+            gemasResultado.replaceChildren();
+            gemasResultado.setAttribute("aria-label", resultado.etiqueta);
+
+            for (let numero = 0; numero < resultado.cantidad; numero += 1) {
+                const gema = document.createElement("img");
+                gema.src = "assets/image.png";
+                gema.alt = "";
+                gemasResultado.append(gema);
+            }
+
+            dialogoRuleta.showModal();
+            resultadoMostrado = true;
+        }
+
+        function detenerInercia() {
+            if (animacion !== null) cancelAnimationFrame(animacion);
             animacion = null;
             velocidad = 0;
         }
 
         function actualizarCentro() {
             const limites = contenedor.getBoundingClientRect();
-
             centroX = limites.left + limites.width / 2;
             centroY = limites.top + limites.height / 2;
         }
@@ -86,30 +107,26 @@
         function obtenerAngulo(evento) {
             const x = evento.clientX - centroX;
             const y = evento.clientY - centroY;
-
             if (Math.hypot(x, y) < 20) return null;
-
             return Math.atan2(y, x) * 180 / Math.PI;
         }
 
         contenedor.addEventListener("pointerdown", (evento) => {
             if (punteroActivo !== null) return;
-
-            if (evento.pointerType === "mouse" && evento.button !== 0) {
-                return;
-            }
+            if (evento.pointerType === "mouse" && evento.button !== 0) return;
 
             evento.preventDefault();
+            clearTimeout(temporizadorTeclado);
             detenerInercia();
             actualizarCentro();
 
+            giroAcumulado = 0;
             punteroActivo = evento.pointerId;
             anguloAnterior = obtenerAngulo(evento);
             tiempoAnterior = performance.now();
             ultimoMovimiento = tiempoAnterior;
 
             imagen.focus({ preventScroll: true });
-
             contenedor.classList.add("arrastrando");
             contenedor.setPointerCapture(evento.pointerId);
         });
@@ -130,58 +147,61 @@
                 return;
             }
 
-            let diferencia = anguloActual - anguloAnterior;
-            diferencia = ((diferencia + 540) % 360) - 180;
-
+            const diferencia = ((anguloActual - anguloAnterior + 540) % 360) - 180;
             const tiempo = Math.max(ahora - tiempoAnterior, 1);
 
             rotacion += diferencia;
+            giroAcumulado += Math.abs(diferencia);
             velocidad = Math.max(-2, Math.min(2, diferencia / tiempo));
 
             anguloAnterior = anguloActual;
             tiempoAnterior = ahora;
             ultimoMovimiento = ahora;
-
             dibujar();
         });
 
-        function iniciarInercia() {
+        function iniciarInercia(giroValido) {
             let ultimoFrame = performance.now();
 
             function continuarGiro(ahora) {
-                const tiempo = Math.min(ahora - ultimoFrame, 32);
+                const tiempo = Math.max(0, Math.min(ahora - ultimoFrame, 32));
                 ultimoFrame = ahora;
 
                 rotacion += velocidad * tiempo;
                 velocidad *= Math.pow(0.95, tiempo / 16.67);
-
                 dibujar();
 
                 if (Math.abs(velocidad) > 0.005) {
                     animacion = requestAnimationFrame(continuarGiro);
-                } else {
-                    velocidad = 0;
-                    animacion = null;
+                    return;
                 }
+
+                detenerInercia();
+                if (giroValido) mostrarResultado();
             }
 
             animacion = requestAnimationFrame(continuarGiro);
         }
 
-        function terminarArrastre(evento, usarInercia) {
+        function terminarArrastre(evento, completado) {
             if (evento.pointerId !== punteroActivo) return;
 
             punteroActivo = null;
             anguloAnterior = null;
-
             contenedor.classList.remove("arrastrando");
 
             if (contenedor.hasPointerCapture(evento.pointerId)) {
                 contenedor.releasePointerCapture(evento.pointerId);
             }
 
+            if (!completado) {
+                detenerInercia();
+                return;
+            }
+
+            const giroValido = giroAcumulado >= 15;
+
             if (
-                !usarInercia ||
                 preferenciaMovimiento.matches ||
                 performance.now() - ultimoMovimiento > 100
             ) {
@@ -189,7 +209,9 @@
             }
 
             if (Math.abs(velocidad) > 0.005) {
-                iniciarInercia();
+                iniciarInercia(giroValido);
+            } else if (giroValido) {
+                mostrarResultado();
             }
         }
 
@@ -210,10 +232,7 @@
         });
 
         imagen.addEventListener("keydown", (evento) => {
-            if (evento.key !== "ArrowLeft" && evento.key !== "ArrowRight") {
-                return;
-            }
-
+            if (evento.key !== "ArrowLeft" && evento.key !== "ArrowRight") return;
             if (punteroActivo !== null) return;
 
             evento.preventDefault();
@@ -221,18 +240,26 @@
 
             rotacion += evento.key === "ArrowRight" ? 15 : -15;
             dibujar();
+
+            clearTimeout(temporizadorTeclado);
+            temporizadorTeclado = setTimeout(mostrarResultado, 350);
+        });
+
+        imagen.addEventListener("blur", () => {
+            clearTimeout(temporizadorTeclado);
         });
 
         preferenciaMovimiento.addEventListener("change", (evento) => {
-            if (evento.matches) detenerInercia();
+            if (!evento.matches || animacion === null) return;
+
+            detenerInercia();
+            if (giroAcumulado >= 15) mostrarResultado();
         });
 
         dibujar();
     });
 
-    /* =====================================
-       MICRÓFONO
-    ===================================== */
+    /* MICRÓFONO */
 
     (() => {
         const boton = document.getElementById("activar-microfono");
@@ -248,15 +275,12 @@
         let analizador = null;
         let datos = null;
         let animacion = null;
-
         let activo = false;
         let iniciando = false;
         let version = 0;
         let intensidad = 0;
 
-        function detener(
-            mensaje = "El micrófono está apagado."
-        ) {
+        function detener(mensaje = "El micrófono está apagado.") {
             version += 1;
             activo = false;
             iniciando = false;
@@ -284,7 +308,6 @@
             analizador = null;
             datos = null;
             intensidad = 0;
-
             medidor.value = 0;
             restablecerDados(dados);
 
@@ -299,15 +322,12 @@
             analizador.getFloatTimeDomainData(datos);
 
             let media = 0;
-
             for (const muestra of datos) {
                 media += muestra;
             }
-
             media /= datos.length;
 
             let suma = 0;
-
             for (const muestra of datos) {
                 suma += (muestra - media) ** 2;
             }
@@ -319,7 +339,6 @@
             );
 
             intensidad += (objetivo - intensidad) * 0.18;
-
             medidor.value = intensidad;
             moverDados(dados, intensidad, ahora, 4);
 
@@ -329,26 +348,18 @@
         async function activar() {
             if (activo || iniciando) return;
 
-            if (
-                !window.isSecureContext ||
-                !navigator.mediaDevices?.getUserMedia
-            ) {
-                estado.textContent =
-                    "Abre la página mediante HTTPS para usar el micrófono.";
+            if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia) {
+                estado.textContent = "Abre la página mediante HTTPS para usar el micrófono.";
                 return;
             }
 
-            const AudioDisponible =
-                window.AudioContext || window.webkitAudioContext;
-
+            const AudioDisponible = window.AudioContext || window.webkitAudioContext;
             if (!AudioDisponible) {
-                estado.textContent =
-                    "Este navegador no permite analizar el audio.";
+                estado.textContent = "Este navegador no permite analizar el audio.";
                 return;
             }
 
             const solicitud = ++version;
-
             iniciando = true;
             boton.textContent = "Cancelar activación";
             estado.textContent = "Permite el acceso al micrófono…";
@@ -356,7 +367,6 @@
             try {
                 const contexto = new AudioDisponible();
                 contextoAudio = contexto;
-
                 await contexto.resume();
 
                 if (solicitud !== version) return;
@@ -385,7 +395,6 @@
 
                 activo = true;
                 iniciando = false;
-
                 boton.textContent = "Apagar micrófono";
                 boton.setAttribute("aria-pressed", "true");
 
@@ -428,9 +437,7 @@
         window.addEventListener("pagehide", () => detener());
     })();
 
-    /* =====================================
-       TRES SACUDIDAS
-    ===================================== */
+    /* TRES SACUDIDAS */
 
     (() => {
         let detenerActual = null;
@@ -449,7 +456,6 @@
             let version = 0;
             let animacion = null;
             let temporizador = null;
-
             let intensidad = 0;
             let ultimoFrame = null;
             let ultimaLectura = null;
@@ -474,9 +480,7 @@
                 }
             });
 
-            function detener(
-                mensaje = "El sensor de movimiento está apagado."
-            ) {
+            function detener(mensaje = "El sensor de movimiento está apagado.") {
                 version += 1;
                 activo = false;
                 iniciando = false;
@@ -495,7 +499,6 @@
                 ultimaLectura = null;
                 gravedad = null;
                 datosRecibidos = false;
-
                 medidor.value = 0;
                 restablecerDados(dados);
 
@@ -529,15 +532,10 @@
                     fuerza = Math.hypot(vector.x, vector.y, vector.z);
                 } else {
                     vector = evento.accelerationIncludingGravity;
-
                     if (!tieneCoordenadas(vector)) return;
 
                     if (!gravedad) {
-                        gravedad = {
-                            x: vector.x,
-                            y: vector.y,
-                            z: vector.z
-                        };
+                        gravedad = { x: vector.x, y: vector.y, z: vector.z };
                     }
 
                     const tiempo = ultimaLectura === null
@@ -546,12 +544,9 @@
 
                     const filtro = Math.exp(-tiempo / 250);
 
-                    gravedad.x =
-                        filtro * gravedad.x + (1 - filtro) * vector.x;
-                    gravedad.y =
-                        filtro * gravedad.y + (1 - filtro) * vector.y;
-                    gravedad.z =
-                        filtro * gravedad.z + (1 - filtro) * vector.z;
+                    gravedad.x = filtro * gravedad.x + (1 - filtro) * vector.x;
+                    gravedad.y = filtro * gravedad.y + (1 - filtro) * vector.y;
+                    gravedad.z = filtro * gravedad.z + (1 - filtro) * vector.z;
 
                     fuerza = Math.hypot(
                         vector.x - gravedad.x,
@@ -566,9 +561,7 @@
                     datosRecibidos = true;
                     clearTimeout(temporizador);
                     temporizador = null;
-
-                    estado.textContent =
-                        "¡Sensor listo! Sacude suavemente el celular.";
+                    estado.textContent = "¡Sensor listo! Sacude suavemente el celular.";
                 }
 
                 const nuevaIntensidad = Math.max(
@@ -592,12 +585,10 @@
                     : Math.min(ahora - ultimoFrame, 50);
 
                 ultimoFrame = ahora;
-
                 medidor.value = intensidad;
                 moverDados(dados, intensidad, ahora, 20);
 
                 intensidad *= Math.exp(-tiempo / 300);
-
                 if (intensidad < 0.001) intensidad = 0;
 
                 animacion = requestAnimationFrame(animar);
@@ -607,16 +598,13 @@
                 if (activo || iniciando || !estaVisible(seccion)) return;
 
                 if (!window.isSecureContext) {
-                    estado.textContent =
-                        "Abre la página mediante HTTPS para usar el movimiento.";
+                    estado.textContent = "Abre la página mediante HTTPS para usar el movimiento.";
                     return;
                 }
 
                 const Sensor = window.DeviceMotionEvent;
-
                 if (!Sensor) {
-                    estado.textContent =
-                        "Este navegador no ofrece acceso al sensor.";
+                    estado.textContent = "Este navegador no ofrece acceso al sensor.";
                     return;
                 }
 
@@ -624,7 +612,6 @@
                 detenerActual = detener;
 
                 const solicitud = ++version;
-
                 iniciando = true;
                 boton.textContent = "Cancelar activación";
                 estado.textContent = "Activando el sensor…";
@@ -640,7 +627,6 @@
                 try {
                     if (typeof Sensor.requestPermission === "function") {
                         const permiso = await Sensor.requestPermission();
-
                         if (solicitud !== version) return;
 
                         if (permiso !== "granted") {
@@ -658,23 +644,14 @@
 
                     activo = true;
                     iniciando = false;
-
                     boton.textContent = "Apagar movimiento";
                     boton.setAttribute("aria-pressed", "true");
+                    estado.textContent = "Esperando datos. Mueve suavemente el celular.";
 
-                    estado.textContent =
-                        "Esperando datos. Mueve suavemente el celular.";
-
-                    window.addEventListener(
-                        "devicemotion",
-                        detectar,
-                        { passive: true }
-                    );
-
+                    window.addEventListener("devicemotion", detectar, { passive: true });
                     animacion = requestAnimationFrame(animar);
                 } catch (error) {
                     if (solicitud !== version) return;
-
                     detener("No se pudo activar el sensor. Revisa los permisos.");
                 }
             }

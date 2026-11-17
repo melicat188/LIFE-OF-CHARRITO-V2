@@ -134,13 +134,10 @@ p {
 .ruleta {
     width: 260px;
     height: 260px;
-
     width: min(260px, 70vw, 38vh);
     height: min(260px, 70vw, 38vh);
-
     width: min(260px, 70vw, 38svh);
     height: min(260px, 70vw, 38svh);
-
     flex: 0 0 auto;
     touch-action: none;
     user-select: none;
@@ -164,6 +161,41 @@ p {
     outline: 3px solid #80e88a;
     outline-offset: 5px;
     border-radius: 50%;
+}
+
+/* RESULTADOS DE LAS RULETAS */
+
+#resultado-ruleta {
+    width: min(420px, calc(100% - 32px));
+    padding: 24px;
+    border: 1px solid #555;
+    border-radius: 16px;
+    background-color: #171717;
+    color: white;
+    text-align: center;
+}
+
+#resultado-ruleta::backdrop {
+    background-color: rgb(0 0 0 / 75%);
+}
+
+#resultado-ruleta h2 {
+    margin: 0;
+}
+
+.gemas-resultado-ruleta {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin: 20px 0;
+}
+
+.gemas-resultado-ruleta img {
+    width: 15%;
+    max-width: 52px;
+    min-width: 0;
+    aspect-ratio: 1;
+    object-fit: contain;
 }
 
 /* DADOS */
@@ -209,6 +241,11 @@ p {
 .boton-control:focus-visible {
     outline: 3px solid white;
     outline-offset: 4px;
+}
+
+.boton-control:disabled {
+    opacity: 0.5;
+    cursor: default;
 }
 
 .estado-control {
@@ -340,7 +377,6 @@ p {
     .ruleta {
         width: min(180px, 35vh);
         height: min(180px, 35vh);
-
         width: min(180px, 35svh);
         height: min(180px, 35svh);
     }
@@ -362,4 +398,3 @@ p {
         transition: none;
     }
 }
-
