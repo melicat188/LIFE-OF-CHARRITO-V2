@@ -154,7 +154,9 @@ p {
     width: 100%;
     height: 100%;
     object-fit: contain;
-    transform-origin: center;
+    translate: -4.5% -3.5%;
+    transform-origin: 54.5% 53.5%;
+    scale: 1.7;
 }
 
 .imagen-ruleta:focus-visible {
