@@ -13,7 +13,7 @@ body {
     padding: 0;
     background-color: black;
     color: white;
-    font-family: Arial, sans-serif;
+    font-family: "Press Start 2P", monospace;
     text-align: center;
 }
 
@@ -156,20 +156,15 @@ p {
     object-fit: contain;
     translate: -4.5% -3.5%;
     transform-origin: 54.5% 53.5%;
-    scale: 1.7;
-}
-
-.imagen-ruleta:focus-visible {
-    outline: 3px solid #80e88a;
-    outline-offset: 5px;
-    border-radius: 50%;
+    scale: 1.35;
 }
 
 /* RESULTADOS DE LAS RULETAS */
 
 #resultado-ruleta {
-    width: min(420px, calc(100% - 32px));
-    padding: 24px;
+    width: fit-content;
+    max-width: calc(100% - 32px);
+    padding: 18px;
     border: 1px solid #555;
     border-radius: 16px;
     background-color: #171717;
@@ -193,8 +188,7 @@ p {
 }
 
 .gemas-resultado-ruleta img {
-    width: 15%;
-    max-width: 52px;
+    width: clamp(24px, 10vw, 44px);
     min-width: 0;
     aspect-ratio: 1;
     object-fit: contain;
@@ -399,4 +393,12 @@ p {
     .carta-interior {
         transition: none;
     }
+}
+
+.ruleta > .imagen-ruleta:focus {
+    outline: none;
+}
+
+.ruleta > .imagen-ruleta:focus-visible {
+    filter: brightness(1.25);
 }

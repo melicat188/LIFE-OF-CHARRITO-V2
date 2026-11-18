@@ -393,6 +393,7 @@
 
                 activo = true;
                 iniciando = false;
+
                 boton.textContent = "Apagar micrófono";
                 boton.setAttribute("aria-pressed", "true");
 
@@ -726,5 +727,77 @@
             window.addEventListener("pagehide", () => detener());
         });
     })();
-})();
 
+    /* EFECTO DE ESCRITURA PARA TEXTOS MARCADOS */
+
+    (() => {
+        if (
+            preferenciaMovimiento.matches ||
+            !("IntersectionObserver" in window)
+        ) {
+            return;
+        }
+
+        const textos = new Map();
+        const milisegundosPorLetra = 45;
+
+        const observador = new IntersectionObserver((entradas) => {
+            for (const entrada of entradas) {
+                if (entrada.intersectionRatio < 0.25) continue;
+
+                const elemento = entrada.target;
+                const { texto, letras, visible, pendiente } = textos.get(elemento);
+                observador.unobserve(elemento);
+                textos.delete(elemento);
+
+                let inicio;
+
+                function escribir(ahora) {
+                    inicio ??= ahora;
+                    const cantidad = 1 + Math.floor(
+                        (ahora - inicio) / milisegundosPorLetra
+                    );
+
+                    if (cantidad >= letras.length || preferenciaMovimiento.matches) {
+                        elemento.textContent = texto;
+                        return;
+                    }
+
+                    visible.data = letras.slice(0, cantidad).join("");
+                    pendiente.textContent = letras.slice(cantidad).join("");
+                    requestAnimationFrame(escribir);
+                }
+
+                requestAnimationFrame(escribir);
+            }
+        }, { threshold: 0.25 });
+
+        for (const elemento of document.querySelectorAll("[data-escritura]")) {
+            const texto = elemento.textContent.trim().replace(/\s+/g, " ");
+            if (!texto) continue;
+
+            const visible = document.createTextNode("");
+            const pendiente = document.createElement("span");
+            pendiente.style.opacity = "0";
+            pendiente.textContent = texto;
+
+            elemento.replaceChildren(visible, pendiente);
+            textos.set(elemento, {
+                texto,
+                letras: Array.from(texto),
+                visible,
+                pendiente
+            });
+            observador.observe(elemento);
+        }
+
+        preferenciaMovimiento.addEventListener("change", (evento) => {
+            if (!evento.matches) return;
+
+            observador.disconnect();
+            for (const [elemento, { texto }] of textos) {
+                elemento.textContent = texto;
+            }
+        });
+    })();
+})();
