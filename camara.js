@@ -242,7 +242,7 @@
                     await navigator.mediaDevices.getUserMedia({
                         audio: false,
                         video: {
-                            facingMode: { ideal: "environment" },
+                            facingMode: { exact: "user" },
                             width: { ideal: 320 },
                             height: { ideal: 240 }
                         }
