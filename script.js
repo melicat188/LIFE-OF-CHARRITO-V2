@@ -1,7 +1,5 @@
 (() => {
-    const preferenciaMovimiento = window.matchMedia(
-        "(prefers-reduced-motion: reduce)"
-    );
+    const preferenciaMovimiento = window.matchMedia("(prefers-reduced-motion: reduce)");
 
     /* FUNCIONES COMPARTIDAS */
 
@@ -395,6 +393,7 @@
 
                 activo = true;
                 iniciando = false;
+
                 boton.textContent = "Apagar micrófono";
                 boton.setAttribute("aria-pressed", "true");
 
@@ -448,6 +447,7 @@
             const nota = seccion.querySelector(".nota-movimiento");
             const medidor = seccion.querySelector(".nivel-sacudida");
             const dados = seccion.querySelectorAll(".dado");
+            const imagenResultado = seccion.dataset.dadoResultado;
 
             if (!boton || !estado || !medidor || !dados.length) return;
 
@@ -461,6 +461,8 @@
             let ultimaLectura = null;
             let gravedad = null;
             let datosRecibidos = false;
+            let ultimaSacudida = null;
+            let resultadoMostrado = false;
 
             function actualizarNota() {
                 if (!nota) return;
@@ -499,6 +501,7 @@
                 ultimaLectura = null;
                 gravedad = null;
                 datosRecibidos = false;
+                ultimaSacudida = null;
                 medidor.value = 0;
                 restablecerDados(dados);
 
@@ -570,6 +573,10 @@
                 );
 
                 intensidad = Math.max(intensidad, nuevaIntensidad);
+
+                if (nuevaIntensidad >= 0.2) {
+                    ultimaSacudida = ahora;
+                }
             }
 
             function animar(ahora) {
@@ -587,6 +594,18 @@
                 ultimoFrame = ahora;
                 medidor.value = intensidad;
                 moverDados(dados, intensidad, ahora, 20);
+
+                if (
+                    imagenResultado &&
+                    !resultadoMostrado &&
+                    ultimaSacudida !== null &&
+                    ahora - ultimaSacudida >= 700
+                ) {
+                    dados.forEach((dado) => {
+                        dado.src = imagenResultado;
+                    });
+                    resultadoMostrado = true;
+                }
 
                 intensidad *= Math.exp(-tiempo / 300);
                 if (intensidad < 0.001) intensidad = 0;
@@ -644,6 +663,7 @@
 
                     activo = true;
                     iniciando = false;
+
                     boton.textContent = "Apagar movimiento";
                     boton.setAttribute("aria-pressed", "true");
                     estado.textContent = "Esperando datos. Mueve suavemente el celular.";
