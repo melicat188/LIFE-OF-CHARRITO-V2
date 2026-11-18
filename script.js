@@ -393,7 +393,6 @@
 
                 activo = true;
                 iniciando = false;
-
                 boton.textContent = "Apagar micrófono";
                 boton.setAttribute("aria-pressed", "true");
 
@@ -548,7 +547,6 @@
                         : Math.min(ahora - ultimaLectura, 100);
 
                     const filtro = Math.exp(-tiempo / 250);
-
                     gravedad.x = filtro * gravedad.x + (1 - filtro) * vector.x;
                     gravedad.y = filtro * gravedad.y + (1 - filtro) * vector.y;
                     gravedad.z = filtro * gravedad.z + (1 - filtro) * vector.z;
@@ -731,48 +729,16 @@
     /* EFECTO DE ESCRITURA PARA TEXTOS MARCADOS */
 
     (() => {
-        if (
-            preferenciaMovimiento.matches ||
-            !("IntersectionObserver" in window)
-        ) {
+        if (preferenciaMovimiento.matches || !("IntersectionObserver" in window)) {
             return;
         }
 
-        const textos = new Map();
         const milisegundosPorLetra = 45;
-
-        const observador = new IntersectionObserver((entradas) => {
-            for (const entrada of entradas) {
-                if (entrada.intersectionRatio < 0.25) continue;
-
-                const elemento = entrada.target;
-                const { texto, letras, visible, pendiente } = textos.get(elemento);
-                observador.unobserve(elemento);
-                textos.delete(elemento);
-
-                let inicio;
-
-                function escribir(ahora) {
-                    inicio ??= ahora;
-                    const cantidad = 1 + Math.floor(
-                        (ahora - inicio) / milisegundosPorLetra
-                    );
-
-                    if (cantidad >= letras.length || preferenciaMovimiento.matches) {
-                        elemento.textContent = texto;
-                        return;
-                    }
-
-                    visible.data = letras.slice(0, cantidad).join("");
-                    pendiente.textContent = letras.slice(cantidad).join("");
-                    requestAnimationFrame(escribir);
-                }
-
-                requestAnimationFrame(escribir);
-            }
-        }, { threshold: 0.25 });
+        const dialogosPorSeccion = new Map();
+        const dialogosPorInicio = new Map();
 
         for (const elemento of document.querySelectorAll("[data-escritura]")) {
+            const seccion = elemento.closest("section") || elemento;
             const texto = elemento.textContent.trim().replace(/\s+/g, " ");
             if (!texto) continue;
 
@@ -780,23 +746,82 @@
             const pendiente = document.createElement("span");
             pendiente.style.opacity = "0";
             pendiente.textContent = texto;
-
             elemento.replaceChildren(visible, pendiente);
-            textos.set(elemento, {
+
+            if (!dialogosPorSeccion.has(seccion)) {
+                dialogosPorSeccion.set(seccion, []);
+            }
+
+            dialogosPorSeccion.get(seccion).push({
+                elemento,
                 texto,
                 letras: Array.from(texto),
                 visible,
                 pendiente
             });
-            observador.observe(elemento);
+        }
+
+        function escribirDialogos(dialogos) {
+            let indice = 0;
+            let inicio;
+
+            function escribir(ahora) {
+                if (preferenciaMovimiento.matches) return;
+
+                const { elemento, texto, letras, visible, pendiente } = dialogos[indice];
+                inicio ??= ahora;
+
+                const cantidad = 1 + Math.floor(
+                    (ahora - inicio) / milisegundosPorLetra
+                );
+
+                if (cantidad >= letras.length) {
+                    elemento.textContent = texto;
+                    indice += 1;
+
+                    if (indice === dialogos.length) return;
+
+                    inicio = undefined;
+                } else {
+                    visible.data = letras.slice(0, cantidad).join("");
+                    pendiente.textContent = letras.slice(cantidad).join("");
+                }
+
+                requestAnimationFrame(escribir);
+            }
+
+            requestAnimationFrame(escribir);
+        }
+
+        const observador = new IntersectionObserver((entradas) => {
+            for (const entrada of entradas) {
+                if (entrada.intersectionRatio < 0.25) continue;
+
+                const dialogos = dialogosPorInicio.get(entrada.target);
+                if (!dialogos) continue;
+
+                observador.unobserve(entrada.target);
+                dialogosPorInicio.delete(entrada.target);
+                escribirDialogos(dialogos);
+            }
+        }, { threshold: 0.25 });
+
+        for (const dialogos of dialogosPorSeccion.values()) {
+            const primerDialogo = dialogos[0].elemento;
+            dialogosPorInicio.set(primerDialogo, dialogos);
+            observador.observe(primerDialogo);
         }
 
         preferenciaMovimiento.addEventListener("change", (evento) => {
             if (!evento.matches) return;
 
             observador.disconnect();
-            for (const [elemento, { texto }] of textos) {
-                elemento.textContent = texto;
+            dialogosPorInicio.clear();
+
+            for (const dialogos of dialogosPorSeccion.values()) {
+                for (const { elemento, texto } of dialogos) {
+                    elemento.textContent = texto;
+                }
             }
         });
     })();
