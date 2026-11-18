@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Life of Charrito</title>
     <link rel="stylesheet" href="style.css?v=13">
-    <script src="script.js?v=13" defer></script>
+    <script src="script.js?v=15" defer></script>
 </head>
 <body>
     <section>
@@ -15,10 +15,7 @@
 
     <section>
         <h1>Este es Charrito</h1>
-        <p>
-            Un héroe que combate las adicciones,
-            como la ludopatía y el doomscroll.
-        </p>
+        <p>Un héroe que combate las adicciones, como la ludopatía y el doomscroll.</p>
         <div class="contenedor-imagen">
             <img src="assets/charrito.jpeg" alt="Charrito">
         </div>
@@ -141,12 +138,10 @@
     <section id="seccion-soplido">
         <h1>Sopla los dados por el buen augurio</h1>
         <p>Activa el micrófono y sopla suavemente hacia él.</p>
-
         <div class="contenedor-dados" id="dados-soplido">
             <img class="dado" src="assets/dado.png" alt="Primer dado para soplar" draggable="false">
             <img class="dado" src="assets/dado.png" alt="Segundo dado para soplar" draggable="false">
         </div>
-
         <button id="activar-microfono" class="boton-control" type="button" aria-pressed="false">
             Activar micrófono
         </button>
@@ -158,15 +153,13 @@
     </section>
 
     <!-- PRIMERA SACUDIDA -->
-    <section class="seccion-sacudida">
+    <section class="seccion-sacudida" data-dado-resultado="assets/dado2.png">
         <h1>Debes sacudir para tirar...</h1>
         <p>Toca “Activar movimiento” y sacude suavemente tu celular.</p>
-
         <div class="contenedor-dados">
             <img class="dado" src="assets/dado.png" alt="Primer dado de la primera tirada" draggable="false">
             <img class="dado" src="assets/dado.png" alt="Segundo dado de la primera tirada" draggable="false">
         </div>
-
         <button class="activar-movimiento boton-control" type="button" aria-pressed="false">
             Activar movimiento
         </button>
@@ -212,15 +205,13 @@
     </section>
 
     <!-- SEGUNDA SACUDIDA -->
-    <section class="seccion-sacudida">
+    <section class="seccion-sacudida" data-dado-resultado="assets/dado3.png">
         <h1>Segunda tirada</h1>
         <p>Activa el movimiento y vuelve a sacudir el celular.</p>
-
         <div class="contenedor-dados">
             <img class="dado" src="assets/dado.png" alt="Primer dado de la segunda tirada" draggable="false">
             <img class="dado" src="assets/dado.png" alt="Segundo dado de la segunda tirada" draggable="false">
         </div>
-
         <button class="activar-movimiento boton-control" type="button" aria-pressed="false">
             Activar movimiento
         </button>
@@ -243,15 +234,13 @@
     </section>
 
     <!-- TERCERA SACUDIDA -->
-    <section class="seccion-sacudida">
+    <section class="seccion-sacudida" data-dado-resultado="assets/dado4.png">
         <h1>Tercera tirada</h1>
         <p>Activa el movimiento y sacude una vez más.</p>
-
         <div class="contenedor-dados">
             <img class="dado" src="assets/dado.png" alt="Primer dado de la tercera tirada" draggable="false">
             <img class="dado" src="assets/dado.png" alt="Segundo dado de la tercera tirada" draggable="false">
         </div>
-
         <button class="activar-movimiento boton-control" type="button" aria-pressed="false">
             Activar movimiento
         </button>
@@ -332,14 +321,7 @@
             No se graba ni se envía.
         </p>
         <p class="nota nota-cartas"></p>
-        <video
-            id="video-luz"
-            class="video-analisis"
-            autoplay
-            muted
-            playsinline
-            aria-hidden="true"
-        ></video>
+        <video id="video-luz" class="video-analisis" autoplay muted playsinline aria-hidden="true"></video>
     </section>
 
     <section>
@@ -351,7 +333,6 @@
         <h1>Eres un adicto a GANAR DINERO. Un joseador.</h1>
     </section>
 
-    <!-- RESULTADOS DE LAS RULETAS -->
     <dialog
         id="resultado-ruleta"
         aria-labelledby="titulo-resultado-ruleta"

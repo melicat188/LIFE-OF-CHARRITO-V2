@@ -393,7 +393,6 @@
 
                 activo = true;
                 iniciando = false;
-
                 boton.textContent = "Apagar micrófono";
                 boton.setAttribute("aria-pressed", "true");
 
@@ -439,6 +438,8 @@
     /* TRES SACUDIDAS */
 
     (() => {
+        const umbralSacudida = 0.06;
+        const pausaParaMostrarResultado = 700;
         let detenerActual = null;
 
         document.querySelectorAll(".seccion-sacudida").forEach((seccion) => {
@@ -462,7 +463,7 @@
             let gravedad = null;
             let datosRecibidos = false;
             let ultimaSacudida = null;
-            let resultadoMostrado = false;
+            let resultadoSolicitado = false;
 
             function actualizarNota() {
                 if (!nota) return;
@@ -574,9 +575,34 @@
 
                 intensidad = Math.max(intensidad, nuevaIntensidad);
 
-                if (nuevaIntensidad >= 0.2) {
+                if (!resultadoSolicitado && nuevaIntensidad >= umbralSacudida) {
                     ultimaSacudida = ahora;
                 }
+            }
+
+            function mostrarResultado() {
+                resultadoSolicitado = true;
+                ultimaSacudida = null;
+
+                const imagen = new Image();
+
+                imagen.onload = () => {
+                    dados.forEach((dado) => {
+                        dado.src = imagenResultado;
+                    });
+
+                    if (activo) {
+                        estado.textContent = "Resultado de la tirada.";
+                    }
+                };
+
+                imagen.onerror = () => {
+                    resultadoSolicitado = false;
+                    estado.textContent =
+                        `No se pudo cargar ${imagenResultado}. Revisa el nombre y la extensión del archivo.`;
+                };
+
+                imagen.src = imagenResultado;
             }
 
             function animar(ahora) {
@@ -597,14 +623,11 @@
 
                 if (
                     imagenResultado &&
-                    !resultadoMostrado &&
+                    !resultadoSolicitado &&
                     ultimaSacudida !== null &&
-                    ahora - ultimaSacudida >= 700
+                    ahora - ultimaSacudida >= pausaParaMostrarResultado
                 ) {
-                    dados.forEach((dado) => {
-                        dado.src = imagenResultado;
-                    });
-                    resultadoMostrado = true;
+                    mostrarResultado();
                 }
 
                 intensidad *= Math.exp(-tiempo / 300);
@@ -704,3 +727,4 @@
         });
     })();
 })();
+
