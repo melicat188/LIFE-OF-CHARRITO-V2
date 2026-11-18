@@ -402,3 +402,44 @@ p {
 .ruleta > .imagen-ruleta:focus-visible {
     filter: brightness(1.25);
 }
+
+/* AJUSTE DE LOS CUADROS DE RESULTADO */
+
+#resultado-ruleta {
+    position: fixed;
+    inset: 0;
+    margin: auto;
+    width: fit-content;
+    max-width: min(340px, calc(100% - 32px));
+    max-height: calc(100% - 32px);
+    padding: 16px;
+    overflow: auto;
+}
+
+#resultado-ruleta h2 {
+    margin: 0;
+    font-size: clamp(12px, 3.8vw, 18px);
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+#resultado-ruleta .gemas-resultado-ruleta {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin: 16px 0;
+}
+
+#resultado-ruleta .gemas-resultado-ruleta img {
+    flex: 0 1 38px;
+    width: 38px;
+    min-width: 0;
+    height: auto;
+    aspect-ratio: 1;
+    object-fit: contain;
+}
+
+#resultado-ruleta .boton-control {
+    font-size: 11px;
+    line-height: 1.5;
+}
