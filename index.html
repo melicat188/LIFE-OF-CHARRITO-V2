@@ -1,20 +1,27 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-      <meta charset="UTF-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Life of Charrito</title>
 
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
     <link rel="stylesheet" href="./style.css?v=22">
 
-    <script src="./script.js?v=19" defer></script>
+    <script src="./script.js?v=20" defer></script>
     <script src="./camara.js?v=1" defer></script>
 </head>
 <body>
     <section>
         <h1>Life of Charrito</h1>
         <p>Desliza ↓</p>
+
+        <audio id="musica-fondo" src="assets/loop%20final%20v2.wav" loop></audio>
+
+        <button id="control-musica" class="boton-control" type="button">
+            Activar música
+        </button>
+        <p id="estado-musica" class="estado-control" role="status" hidden></p>
     </section>
 
     <section>
@@ -26,12 +33,9 @@
     </section>
 
     <section>
-        <p data-escritura>-¿Y tú peleas contra todo eso?- le preguntas </p>
-           <p data-escritura>-Contra todo eso y más, parcero.- responde Charrito.</p>
-
-  </section>
-
-     
+        <p data-escritura>-¿Y tú peleas contra todo eso?- le preguntas</p>
+        <p data-escritura>-Contra todo eso y más, parcero.- responde Charrito.</p>
+    </section>
 
     <section>
         <div class="contenedor-verdes">
@@ -45,54 +49,60 @@
             de las adicciones y pudo recolectar una recompensa
             con la que el rey le agradeció.
         </p>
-        </section>
+    </section>
 
-        <section>
-            <p data-escritura> - Majestad, no es necesario.- Le dijo Charrito al Rey cuando le otorgaron las gemas </p>
-            <p data-escritura> -Lo es, valiente héroe. Acepta estas gemas como muestra de nuestra gratitud.-  Respondió el Rey.</p>    
+    <section>
+        <p data-escritura>
+            - Majestad, no es necesario.- Le dijo Charrito al Rey cuando le otorgaron las gemas
+        </p>
+        <p data-escritura>
+            -Lo es, valiente héroe. Acepta estas gemas como muestra de nuestra gratitud.- Respondió el Rey.
+        </p>
+    </section>
 
-        </section>
-
-         <section>
+    <section>
         <p>Estas gemas son la moneda de la que depende Charrito.</p>
-        </section>
+    </section>
 
+    <section>
+        <h1>Es la primera vez</h1>
+        <p>
+            que Charrito acumula tanta riqueza en sus bolsillos. Por eso, te pide que lo
+            acompañes en su próxima aventura, para que le ayudes a no caer en la tentación
+            de las adicciones.
+        </p>
+    </section>
 
-        <section>
-            <h1>Es la primera vez</h1>
+    <section>
+        <p data-escritura>-¿Estás dispuesto a ayudarme, amigo?- Te pregunta Charrito</p>
+        <p data-escritura>Tú no dudas ni un segundo en responder. -¡Sí!-</p>
+    </section>
 
-        <p>que Charrito
-acumula tanta riqueza en sus bolsillos. Por eso, te pide que lo acompañes en su próxima aventura, para que le ayudes a no caer en la tentación de las adicciones.</p>
-        </section>
-
-        <section>
-            <p data-escritura> -¿Estás dispuesta a ayudarme, amigo?- Te pregunta Charrito </p>
-            <p data-escritura>Tú no dudas ni un segundo en responder. -¡Sí!-</p>
-        </section>
-
-        <section>
-
+    <section>
         <h1>La misión de Charrito es la siguiente:</h1>
-
-        <p>Derrotar al malvado Borracho Apostador, el es reconocido por ser el  mayor creador de tanta miseria en el mundo, causada por la ludopatía y el doomscrolling.</p>
-        </section>
+        <p>
+            Derrotar al malvado Borracho Apostador, el es reconocido por ser el mayor
+            creador de tanta miseria en el mundo, causada por la ludopatía y el doomscrolling.
+        </p>
+    </section>
 
     <section>
         <h1>PRIMER TRIAL</h1>
         <p>
             Charrito debe pagar por una información que lo lleve
             al paradero del malvado borracho apostador.
-             <div class="contenedor-imagen">
+        </p>
+        <div class="contenedor-imagen">
             <img src="assets/informante.jpeg" alt="Informate">
         </div>
-        </p>
     </section>
 
     <section>
         <h1>PERO</h1>
         <p>
             Solo tiene 3 gemas...
-            Charrito sabe que necesitará más gemas para llegar a él... La única forma de obtener más gemas es apostandolas en un juego de ruleta.
+            Charrito sabe que necesitará más gemas para llegar a él... La única forma
+            de obtener más gemas es apostandolas en un juego de ruleta.
         </p>
     </section>
 
@@ -143,8 +153,11 @@ acumula tanta riqueza en sus bolsillos. Por eso, te pide que lo acompañes en su
     </div>
 
     <section>
-      <p data-escritura> - Gracias compa, fuiste de gran ayuda, ¿estás seguro que quieres continuar? Se puede volver peligroso- </p>
-      <p data-escritura> - Claro que sí - Contestas entusiasmado. </p>
+        <p data-escritura>
+            - Gracias compa, fuiste de gran ayuda, ¿estás seguro que quieres continuar?
+            Se puede volver peligroso-
+        </p>
+        <p data-escritura>- Claro que sí - Contestas entusiasmado.</p>
     </section>
 
     <section>
@@ -167,8 +180,7 @@ acumula tanta riqueza en sus bolsillos. Por eso, te pide que lo acompañes en su
         <p>
             Llegamos a la Taverna del Vicio...
             donde nos recibe un celador adicto a la nicotina.
-es una casa vieja, las tejas rotas y muros caidos...
-
+            es una casa vieja, las tejas rotas y muros caidos...
         </p>
         <p>
             El celador no le va a permitir el ingreso a Charrito,
@@ -227,7 +239,7 @@ es una casa vieja, las tejas rotas y muros caidos...
         <p data-escritura>
             -Compa... yo... tuve serios problemas
             con las adicciones, apuestas, vicios...
-
+        </p>
         <p data-escritura>Debo ser fuerte para no recaer en ello...</p>
         <p data-escritura>
             Por favor... ayúdeme compita,
@@ -351,9 +363,9 @@ es una casa vieja, las tejas rotas y muros caidos...
             </div>
         </div>
 
-<button id="activar-camara" class="boton-control" type="button" aria-pressed="false">
-    Activar cámara
-</button>
+        <button id="activar-camara" class="boton-control" type="button" aria-pressed="false">
+            Activar cámara
+        </button>
         <p id="estado-camara" class="estado-control" role="status">
             La cámara está desactivada por ahora.
         </p>
@@ -373,7 +385,7 @@ es una casa vieja, las tejas rotas y muros caidos...
             Charrito logró evitar la adicción, pero en su viaje, no pudo evitar
             que tú cayeras en ella. Ahora estás atrapado:
         </p>
-        <h1>Eres un ludopata, que también es adicto al doomscrolling. </h1>
+        <h1>Eres un ludopata, que también es adicto al doomscrolling.</h1>
     </section>
 
     <dialog
@@ -387,6 +399,50 @@ es una casa vieja, las tejas rotas y muros caidos...
             <button class="boton-control" type="submit" autofocus>Continuar</button>
         </form>
     </dialog>
+
+    <script>
+        (() => {
+            const musica = document.getElementById("musica-fondo");
+            const boton = document.getElementById("control-musica");
+            const estado = document.getElementById("estado-musica");
+
+            function mostrarError() {
+                estado.hidden = false;
+                estado.textContent = "No se pudo cargar el archivo de música.";
+            }
+
+            async function reproducir() {
+                try {
+                    await musica.play();
+                } catch (error) {
+                    if (error.name !== "NotAllowedError" && error.name !== "AbortError") {
+                        mostrarError();
+                    }
+                }
+            }
+
+            musica.addEventListener("play", () => {
+                boton.textContent = "Pausar música";
+                estado.hidden = true;
+            });
+
+            musica.addEventListener("pause", () => {
+                boton.textContent = "Activar música";
+            });
+
+            musica.addEventListener("error", mostrarError);
+
+            boton.addEventListener("click", () => {
+                if (musica.paused) {
+                    reproducir();
+                } else {
+                    musica.pause();
+                }
+            });
+
+            reproducir();
+        })();
+    </script>
 </body>
 </html>
 
