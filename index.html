@@ -8,16 +8,13 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
     <link rel="stylesheet" href="./style.css?v=22">
 
-    <script src="./script.js?v=20" defer></script>
+    <script src="./script.js?v=23" defer></script>
     <script src="./camara.js?v=1" defer></script>
 </head>
 <body>
     <section>
         <h1>Life of Charrito</h1>
         <p>Desliza ↓</p>
-
-        <audio id="musica-fondo" src="assets/loop%20final%20v2.wav" loop></audio>
-
         <button id="control-musica" class="boton-control" type="button">
             Activar música
         </button>
@@ -74,7 +71,7 @@
     </section>
 
     <section>
-        <p data-escritura>-¿Estás dispuesto a ayudarme, amigo?- Te pregunta Charrito</p>
+        <p data-escritura>-¿Estás dispuesta a ayudarme, amigo?- Te pregunta Charrito</p>
         <p data-escritura>Tú no dudas ni un segundo en responder. -¡Sí!-</p>
     </section>
 
@@ -399,50 +396,5 @@
             <button class="boton-control" type="submit" autofocus>Continuar</button>
         </form>
     </dialog>
-
-    <script>
-        (() => {
-            const musica = document.getElementById("musica-fondo");
-            const boton = document.getElementById("control-musica");
-            const estado = document.getElementById("estado-musica");
-
-            function mostrarError() {
-                estado.hidden = false;
-                estado.textContent = "No se pudo cargar el archivo de música.";
-            }
-
-            async function reproducir() {
-                try {
-                    await musica.play();
-                } catch (error) {
-                    if (error.name !== "NotAllowedError" && error.name !== "AbortError") {
-                        mostrarError();
-                    }
-                }
-            }
-
-            musica.addEventListener("play", () => {
-                boton.textContent = "Pausar música";
-                estado.hidden = true;
-            });
-
-            musica.addEventListener("pause", () => {
-                boton.textContent = "Activar música";
-            });
-
-            musica.addEventListener("error", mostrarError);
-
-            boton.addEventListener("click", () => {
-                if (musica.paused) {
-                    reproducir();
-                } else {
-                    musica.pause();
-                }
-            });
-
-            reproducir();
-        })();
-    </script>
 </body>
 </html>
-

@@ -852,7 +852,7 @@
     }
 
     const volumen = contexto.createGain();
-    volumen.gain.value = 0.25;
+    volumen.gain.value = 0.15;
     volumen.connect(contexto.destination);
 
     function actualizarBoton() {
