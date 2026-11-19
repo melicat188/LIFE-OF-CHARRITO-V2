@@ -20,7 +20,8 @@
 
         const pistas = {
             dados: cargar("./assets/dados-audio.mpeg"),
-            ruleta: cargar("./assets/ruleta-audio.mpeg")
+            ruleta: cargar("./assets/ruleta-audio.mpeg"),
+            gemas: cargar("./assets/gemas-audio.mpeg")
         };
         const reproduciendo = new Map();
 
@@ -194,6 +195,7 @@
 
             dialogoRuleta.showModal();
             resultadoMostrado = true;
+            efectos.reproducir("gemas", resultado);
         }
 
         function detenerInercia(cortarSonido = true) {

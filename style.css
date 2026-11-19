@@ -159,12 +159,44 @@ p {
     scale: 1.35;
 }
 
+.ruleta > .imagen-ruleta:focus {
+    outline: none;
+}
+
+.ruleta > .imagen-ruleta:focus-visible {
+    filter: brightness(1.25);
+}
+
 /* RESULTADOS DE LAS RULETAS */
 
-#resultado-ruleta {
+#resultado-ruleta[open] {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    height: 100dvh;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: 16px;
+    border: 0;
+    background: transparent;
+    transform: none;
+    display: grid;
+    grid-template: minmax(0, 1fr) / minmax(0, 1fr);
+    place-items: center;
+}
+
+#resultado-ruleta::backdrop {
+    background-color: rgb(0 0 0 / 75%);
+}
+
+.panel-resultado-ruleta {
     width: fit-content;
-    max-width: calc(100% - 32px);
-    padding: 18px;
+    max-width: min(340px, 100%);
+    max-height: 100%;
+    overflow: auto;
+    padding: 16px;
     border: 1px solid #555;
     border-radius: 16px;
     background-color: #171717;
@@ -172,26 +204,32 @@ p {
     text-align: center;
 }
 
-#resultado-ruleta::backdrop {
-    background-color: rgb(0 0 0 / 75%);
-}
-
-#resultado-ruleta h2 {
+.panel-resultado-ruleta h2 {
     margin: 0;
+    font-size: clamp(12px, 3.8vw, 18px);
+    line-height: 1.6;
+    overflow-wrap: anywhere;
 }
 
 .gemas-resultado-ruleta {
     display: flex;
     justify-content: center;
-    gap: 8px;
-    margin: 20px 0;
+    gap: 6px;
+    margin: 16px 0;
 }
 
 .gemas-resultado-ruleta img {
-    width: clamp(24px, 10vw, 44px);
+    flex: 0 1 38px;
+    width: 38px;
     min-width: 0;
+    height: auto;
     aspect-ratio: 1;
     object-fit: contain;
+}
+
+.panel-resultado-ruleta .boton-control {
+    font-size: 11px;
+    line-height: 1.5;
 }
 
 /* DADOS */
@@ -393,53 +431,4 @@ p {
     .carta-interior {
         transition: none;
     }
-}
-
-.ruleta > .imagen-ruleta:focus {
-    outline: none;
-}
-
-.ruleta > .imagen-ruleta:focus-visible {
-    filter: brightness(1.25);
-}
-
-/* AJUSTE DE LOS CUADROS DE RESULTADO */
-
-#resultado-ruleta {
-    position: fixed;
-    inset: 0;
-    margin: auto;
-    width: fit-content;
-    max-width: min(340px, calc(100% - 32px));
-    max-height: calc(100% - 32px);
-    padding: 16px;
-    overflow: auto;
-}
-
-#resultado-ruleta h2 {
-    margin: 0;
-    font-size: clamp(12px, 3.8vw, 18px);
-    line-height: 1.6;
-    overflow-wrap: anywhere;
-}
-
-#resultado-ruleta .gemas-resultado-ruleta {
-    display: flex;
-    justify-content: center;
-    gap: 6px;
-    margin: 16px 0;
-}
-
-#resultado-ruleta .gemas-resultado-ruleta img {
-    flex: 0 1 38px;
-    width: 38px;
-    min-width: 0;
-    height: auto;
-    aspect-ratio: 1;
-    object-fit: contain;
-}
-
-#resultado-ruleta .boton-control {
-    font-size: 11px;
-    line-height: 1.5;
 }
