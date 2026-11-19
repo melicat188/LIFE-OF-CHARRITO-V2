@@ -393,6 +393,7 @@
 
                 activo = true;
                 iniciando = false;
+
                 boton.textContent = "Apagar micrófono";
                 boton.setAttribute("aria-pressed", "true");
 
