@@ -5,21 +5,24 @@
 
     const efectos = (() => {
         const AudioDisponible = window.AudioContext || window.webkitAudioContext;
-        if (!AudioDisponible) return { reproducir() {} };
+
+        if (!AudioDisponible) {
+            return { reproducir() {}, detener() {} };
+        }
 
         let contexto;
 
         try {
             contexto = new AudioDisponible();
         } catch {
-            return { reproducir() {} };
+            return { reproducir() {}, detener() {} };
         }
 
         const pistas = {
             dados: cargar("./assets/dados-audio.mpeg"),
             ruleta: cargar("./assets/ruleta-audio.mpeg")
         };
-        const reproduciendo = new Set();
+        const reproduciendo = new Map();
 
         async function cargar(ruta) {
             try {
@@ -45,15 +48,20 @@
         document.addEventListener("click", activarAudio, true);
         document.addEventListener("keydown", activarAudio, true);
 
-        async function reproducir(nombre) {
-            if (reproduciendo.has(nombre)) return;
-            reproduciendo.add(nombre);
+        async function reproducir(nombre, clave = nombre) {
+            if (reproduciendo.has(clave)) return;
+
+            const turno = { fuente: null };
+            reproduciendo.set(clave, turno);
 
             try {
                 const pista = await pistas[nombre];
 
+                // El movimiento pudo terminar mientras se cargaba el audio.
+                if (reproduciendo.get(clave) !== turno) return;
+
                 if (!pista) {
-                    reproduciendo.delete(nombre);
+                    reproduciendo.delete(clave);
                     return;
                 }
 
@@ -63,17 +71,30 @@
 
                 fuente.addEventListener("ended", () => {
                     fuente.disconnect();
-                    reproduciendo.delete(nombre);
+
+                    if (reproduciendo.get(clave) === turno) {
+                        reproduciendo.delete(clave);
+                    }
                 }, { once: true });
 
                 fuente.start();
+                turno.fuente = fuente;
             } catch (error) {
-                reproduciendo.delete(nombre);
+                if (reproduciendo.get(clave) === turno) {
+                    reproduciendo.delete(clave);
+                }
+
                 console.warn(`No se pudo reproducir el efecto ${nombre}.`, error);
             }
         }
 
-        return { reproducir };
+        function detener(clave) {
+            const turno = reproduciendo.get(clave);
+            reproduciendo.delete(clave);
+            turno?.fuente?.stop();
+        }
+
+        return { reproducir, detener };
     })();
 
     /* FUNCIONES COMPARTIDAS */
@@ -115,6 +136,7 @@
         perdida: { mensaje: "Pierdes dos gemas", cantidad: 1, etiqueta: "Una gema" },
         ganancia: { mensaje: "Ganaste cinco gemas", cantidad: 5, etiqueta: "Cinco gemas" }
     };
+
     const giroMinimo = 15;
 
     document.querySelectorAll(".ruleta").forEach((contenedor) => {
@@ -123,6 +145,7 @@
 
         const resultado = resultadosRuleta[contenedor.dataset.resultado];
         let resultadoMostrado = false;
+        let sonidoUsado = false;
         let temporizadorTeclado = null;
         let rotacion = 0;
         let velocidad = 0;
@@ -137,6 +160,13 @@
 
         function dibujar() {
             imagen.style.transform = `rotate(${rotacion}deg)`;
+        }
+
+        function sonarRuleta() {
+            if (sonidoUsado) return;
+
+            sonidoUsado = true;
+            efectos.reproducir("ruleta", contenedor);
         }
 
         function mostrarResultado() {
@@ -166,10 +196,13 @@
             resultadoMostrado = true;
         }
 
-        function detenerInercia() {
+        function detenerInercia(cortarSonido = true) {
             if (animacion !== null) cancelAnimationFrame(animacion);
+
             animacion = null;
             velocidad = 0;
+
+            if (cortarSonido) efectos.detener(contenedor);
         }
 
         function actualizarCentro() {
@@ -181,6 +214,7 @@
         function obtenerAngulo(evento) {
             const x = evento.clientX - centroX;
             const y = evento.clientY - centroY;
+
             if (Math.hypot(x, y) < 20) return null;
             return Math.atan2(y, x) * 180 / Math.PI;
         }
@@ -191,6 +225,7 @@
 
             evento.preventDefault();
             clearTimeout(temporizadorTeclado);
+            temporizadorTeclado = null;
             detenerInercia();
             actualizarCentro();
 
@@ -230,7 +265,7 @@
             velocidad = Math.max(-2, Math.min(2, diferencia / tiempo));
 
             if (giroAnterior < giroMinimo && giroAcumulado >= giroMinimo) {
-                efectos.reproducir("ruleta");
+                sonarRuleta();
             }
 
             anguloAnterior = anguloActual;
@@ -289,8 +324,9 @@
 
             if (Math.abs(velocidad) > 0.005) {
                 iniciarInercia(giroValido);
-            } else if (giroValido) {
-                mostrarResultado();
+            } else {
+                efectos.detener(contenedor);
+                if (giroValido) mostrarResultado();
             }
         }
 
@@ -315,17 +351,25 @@
             if (punteroActivo !== null) return;
 
             evento.preventDefault();
-            detenerInercia();
+            detenerInercia(false);
             rotacion += evento.key === "ArrowRight" ? giroMinimo : -giroMinimo;
             dibujar();
-            efectos.reproducir("ruleta");
+            sonarRuleta();
 
             clearTimeout(temporizadorTeclado);
-            temporizadorTeclado = setTimeout(mostrarResultado, 350);
+            temporizadorTeclado = setTimeout(() => {
+                temporizadorTeclado = null;
+                efectos.detener(contenedor);
+                mostrarResultado();
+            }, 350);
         });
 
         imagen.addEventListener("blur", () => {
+            if (temporizadorTeclado === null) return;
+
             clearTimeout(temporizadorTeclado);
+            temporizadorTeclado = null;
+            efectos.detener(contenedor);
         });
 
         preferenciaMovimiento.addEventListener("change", (evento) => {
@@ -432,6 +476,7 @@
             }
 
             const AudioDisponible = window.AudioContext || window.webkitAudioContext;
+
             if (!AudioDisponible) {
                 estado.textContent = "Este navegador no permite analizar el audio.";
                 return;
@@ -545,6 +590,7 @@
             let datosRecibidos = false;
             let ultimaSacudida = null;
             let ultimoMovimientoSonoro = null;
+            let sonidoDadosUsado = false;
             let resultadoSolicitado = false;
 
             function actualizarNota() {
@@ -583,6 +629,7 @@
                 datosRecibidos = false;
                 ultimaSacudida = null;
                 ultimoMovimientoSonoro = null;
+                efectos.detener(seccion);
                 medidor.value = 0;
                 restablecerDados(dados);
 
@@ -655,14 +702,14 @@
                 intensidad = Math.max(intensidad, nuevaIntensidad);
 
                 if (nuevaIntensidad >= umbralSacudida) {
-                    if (
-                        ultimoMovimientoSonoro === null ||
-                        ahora - ultimoMovimientoSonoro >= pausaParaMostrarResultado
-                    ) {
-                        efectos.reproducir("dados");
+                    if (!sonidoDadosUsado) {
+                        sonidoDadosUsado = true;
+                        efectos.reproducir("dados", seccion);
+                        ultimoMovimientoSonoro = ahora;
+                    } else if (ultimoMovimientoSonoro !== null) {
+                        ultimoMovimientoSonoro = ahora;
                     }
 
-                    ultimoMovimientoSonoro = ahora;
                     if (!resultadoSolicitado) ultimaSacudida = ahora;
                 }
             }
@@ -707,6 +754,14 @@
                 moverDados(dados, intensidad, ahora, 20);
 
                 if (
+                    ultimoMovimientoSonoro !== null &&
+                    ahora - ultimoMovimientoSonoro >= pausaParaMostrarResultado
+                ) {
+                    efectos.detener(seccion);
+                    ultimoMovimientoSonoro = null;
+                }
+
+                if (
                     imagenResultado &&
                     !resultadoSolicitado &&
                     ultimaSacudida !== null &&
@@ -730,6 +785,7 @@
                 }
 
                 const Sensor = window.DeviceMotionEvent;
+
                 if (!Sensor) {
                     estado.textContent = "Este navegador no ofrece acceso al sensor.";
                     return;
@@ -962,6 +1018,7 @@
             } else {
                 await contexto.resume();
             }
+
             actualizarBoton();
         } catch {
             mostrarEstado("No se pudo cambiar la reproducción de la música.");
