@@ -1,6 +1,81 @@
 (() => {
     const preferenciaMovimiento = window.matchMedia("(prefers-reduced-motion: reduce)");
 
+    /* EFECTOS DE SONIDO */
+
+    const efectos = (() => {
+        const AudioDisponible = window.AudioContext || window.webkitAudioContext;
+        if (!AudioDisponible) return { reproducir() {} };
+
+        let contexto;
+
+        try {
+            contexto = new AudioDisponible();
+        } catch {
+            return { reproducir() {} };
+        }
+
+        const pistas = {
+            dados: cargar("./assets/dados-audio.mpeg"),
+            ruleta: cargar("./assets/ruleta-audio.mpeg")
+        };
+        const reproduciendo = new Set();
+
+        async function cargar(ruta) {
+            try {
+                const respuesta = await fetch(ruta);
+                if (!respuesta.ok) throw new Error(`HTTP ${respuesta.status}`);
+
+                const datos = await respuesta.arrayBuffer();
+                return await contexto.decodeAudioData(datos);
+            } catch (error) {
+                console.warn(`No se pudo cargar el efecto ${ruta}.`, error);
+                return null;
+            }
+        }
+
+        function activarAudio() {
+            if (contexto.state !== "running") {
+                contexto.resume().catch(() => {});
+            }
+        }
+
+        document.addEventListener("pointerdown", activarAudio, true);
+        document.addEventListener("pointerup", activarAudio, true);
+        document.addEventListener("click", activarAudio, true);
+        document.addEventListener("keydown", activarAudio, true);
+
+        async function reproducir(nombre) {
+            if (reproduciendo.has(nombre)) return;
+            reproduciendo.add(nombre);
+
+            try {
+                const pista = await pistas[nombre];
+
+                if (!pista) {
+                    reproduciendo.delete(nombre);
+                    return;
+                }
+
+                const fuente = contexto.createBufferSource();
+                fuente.buffer = pista;
+                fuente.connect(contexto.destination);
+
+                fuente.addEventListener("ended", () => {
+                    fuente.disconnect();
+                    reproduciendo.delete(nombre);
+                }, { once: true });
+
+                fuente.start();
+            } catch (error) {
+                reproduciendo.delete(nombre);
+                console.warn(`No se pudo reproducir el efecto ${nombre}.`, error);
+            }
+        }
+
+        return { reproducir };
+    })();
+
     /* FUNCIONES COMPARTIDAS */
 
     function restablecerDados(dados) {
@@ -40,6 +115,7 @@
         perdida: { mensaje: "Pierdes dos gemas", cantidad: 1, etiqueta: "Una gema" },
         ganancia: { mensaje: "Ganaste cinco gemas", cantidad: 5, etiqueta: "Cinco gemas" }
     };
+    const giroMinimo = 15;
 
     document.querySelectorAll(".ruleta").forEach((contenedor) => {
         const imagen = contenedor.querySelector(".imagen-ruleta");
@@ -147,10 +223,15 @@
 
             const diferencia = ((anguloActual - anguloAnterior + 540) % 360) - 180;
             const tiempo = Math.max(ahora - tiempoAnterior, 1);
+            const giroAnterior = giroAcumulado;
 
             rotacion += diferencia;
             giroAcumulado += Math.abs(diferencia);
             velocidad = Math.max(-2, Math.min(2, diferencia / tiempo));
+
+            if (giroAnterior < giroMinimo && giroAcumulado >= giroMinimo) {
+                efectos.reproducir("ruleta");
+            }
 
             anguloAnterior = anguloActual;
             tiempoAnterior = ahora;
@@ -197,7 +278,7 @@
                 return;
             }
 
-            const giroValido = giroAcumulado >= 15;
+            const giroValido = giroAcumulado >= giroMinimo;
 
             if (
                 preferenciaMovimiento.matches ||
@@ -235,8 +316,9 @@
 
             evento.preventDefault();
             detenerInercia();
-            rotacion += evento.key === "ArrowRight" ? 15 : -15;
+            rotacion += evento.key === "ArrowRight" ? giroMinimo : -giroMinimo;
             dibujar();
+            efectos.reproducir("ruleta");
 
             clearTimeout(temporizadorTeclado);
             temporizadorTeclado = setTimeout(mostrarResultado, 350);
@@ -250,7 +332,7 @@
             if (!evento.matches || animacion === null) return;
 
             detenerInercia();
-            if (giroAcumulado >= 15) mostrarResultado();
+            if (giroAcumulado >= giroMinimo) mostrarResultado();
         });
 
         dibujar();
@@ -391,6 +473,7 @@
 
                 activo = true;
                 iniciando = false;
+
                 boton.textContent = "Apagar micrófono";
                 boton.setAttribute("aria-pressed", "true");
 
@@ -461,6 +544,7 @@
             let gravedad = null;
             let datosRecibidos = false;
             let ultimaSacudida = null;
+            let ultimoMovimientoSonoro = null;
             let resultadoSolicitado = false;
 
             function actualizarNota() {
@@ -498,6 +582,7 @@
                 gravedad = null;
                 datosRecibidos = false;
                 ultimaSacudida = null;
+                ultimoMovimientoSonoro = null;
                 medidor.value = 0;
                 restablecerDados(dados);
 
@@ -569,8 +654,16 @@
 
                 intensidad = Math.max(intensidad, nuevaIntensidad);
 
-                if (!resultadoSolicitado && nuevaIntensidad >= umbralSacudida) {
-                    ultimaSacudida = ahora;
+                if (nuevaIntensidad >= umbralSacudida) {
+                    if (
+                        ultimoMovimientoSonoro === null ||
+                        ahora - ultimoMovimientoSonoro >= pausaParaMostrarResultado
+                    ) {
+                        efectos.reproducir("dados");
+                    }
+
+                    ultimoMovimientoSonoro = ahora;
+                    if (!resultadoSolicitado) ultimaSacudida = ahora;
                 }
             }
 
@@ -585,9 +678,7 @@
                         dado.src = imagenResultado;
                     });
 
-                    if (activo) {
-                        estado.textContent = "Resultado de la tirada.";
-                    }
+                    if (activo) estado.textContent = "Resultado de la tirada.";
                 };
 
                 imagen.onerror = () => {
@@ -680,6 +771,7 @@
 
                     activo = true;
                     iniciando = false;
+
                     boton.textContent = "Apagar movimiento";
                     boton.setAttribute("aria-pressed", "true");
                     estado.textContent = "Esperando datos. Mueve suavemente el celular.";
@@ -852,7 +944,7 @@
     }
 
     const volumen = contexto.createGain();
-    volumen.gain.value = 0.15;
+    volumen.gain.value = 0.25;
     volumen.connect(contexto.destination);
 
     function actualizarBoton() {
