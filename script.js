@@ -235,7 +235,6 @@
 
             evento.preventDefault();
             detenerInercia();
-
             rotacion += evento.key === "ArrowRight" ? 15 : -15;
             dibujar();
 
@@ -339,7 +338,6 @@
             intensidad += (objetivo - intensidad) * 0.18;
             medidor.value = intensidad;
             moverDados(dados, intensidad, ahora, 4);
-
             animacion = requestAnimationFrame(analizar);
         }
 
@@ -393,7 +391,6 @@
 
                 activo = true;
                 iniciando = false;
-
                 boton.textContent = "Apagar micrófono";
                 boton.setAttribute("aria-pressed", "true");
 
@@ -478,10 +475,7 @@
 
             preferenciaMovimiento.addEventListener("change", () => {
                 actualizarNota();
-
-                if (preferenciaMovimiento.matches) {
-                    restablecerDados(dados);
-                }
+                if (preferenciaMovimiento.matches) restablecerDados(dados);
             });
 
             function detener(mensaje = "El sensor de movimiento está apagado.") {
@@ -686,7 +680,6 @@
 
                     activo = true;
                     iniciando = false;
-
                     boton.textContent = "Apagar movimiento";
                     boton.setAttribute("aria-pressed", "true");
                     estado.textContent = "Esperando datos. Mueve suavemente el celular.";
@@ -781,7 +774,6 @@
                     indice += 1;
 
                     if (indice === dialogos.length) return;
-
                     inicio = undefined;
                 } else {
                     visible.data = letras.slice(0, cantidad).join("");
@@ -826,4 +818,87 @@
             }
         });
     })();
+})();
+
+/* MÚSICA DE FONDO */
+
+(() => {
+    const boton = document.getElementById("control-musica");
+    const estado = document.getElementById("estado-musica");
+
+    if (!boton || !estado) return;
+
+    const AudioContextDisponible = window.AudioContext || window.webkitAudioContext;
+
+    function mostrarEstado(mensaje) {
+        estado.textContent = mensaje;
+        estado.hidden = !mensaje;
+    }
+
+    if (!AudioContextDisponible) {
+        boton.disabled = true;
+        mostrarEstado("Este navegador no permite reproducir el bucle de música.");
+        return;
+    }
+
+    let contexto;
+
+    try {
+        contexto = new AudioContextDisponible();
+    } catch {
+        boton.disabled = true;
+        mostrarEstado("No se pudo iniciar el audio en este navegador.");
+        return;
+    }
+
+    const volumen = contexto.createGain();
+    volumen.gain.value = 0.25;
+    volumen.connect(contexto.destination);
+
+    function actualizarBoton() {
+        boton.textContent = contexto.state === "running"
+            ? "Pausar música"
+            : "Activar música";
+    }
+
+    contexto.addEventListener("statechange", actualizarBoton);
+
+    boton.addEventListener("click", async () => {
+        try {
+            if (contexto.state === "running") {
+                await contexto.suspend();
+            } else {
+                await contexto.resume();
+            }
+            actualizarBoton();
+        } catch {
+            mostrarEstado("No se pudo cambiar la reproducción de la música.");
+        }
+    });
+
+    async function prepararBucle() {
+        mostrarEstado("Cargando música…");
+
+        try {
+            const respuesta = await fetch("./assets/loop%20final%20v2.wav");
+            if (!respuesta.ok) throw new Error("No se encontró el WAV.");
+
+            const datos = await respuesta.arrayBuffer();
+            const pista = await contexto.decodeAudioData(datos);
+
+            const fuente = contexto.createBufferSource();
+            fuente.buffer = pista;
+            fuente.loop = true;
+            fuente.connect(volumen);
+            fuente.start();
+
+            mostrarEstado("");
+        } catch {
+            boton.disabled = true;
+            mostrarEstado("No se pudo cargar loop final v2.wav.");
+        }
+    }
+
+    actualizarBoton();
+    prepararBucle();
 })();
