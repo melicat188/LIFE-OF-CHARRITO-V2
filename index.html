@@ -6,16 +6,14 @@
     <title>Life of Charrito</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
     <link rel="stylesheet" href="./style.css?v=30">
-    <script src="./script.js?v=30" defer></script>
+    <script src="./script.js?v=32" defer></script>
     <script src="./camara.js?v=2" defer></script>
 </head>
 <body>
     <section>
         <h1>Life of Charrito</h1>
         <p>Desliza ↓</p>
-        <button id="control-musica" class="boton-control" type="button">
-            Activar música
-        </button>
+        <button id="control-musica" class="boton-control" type="button">Activar música</button>
         <p id="estado-musica" class="estado-control" role="status" hidden></p>
     </section>
 
@@ -111,7 +109,6 @@
         <button class="boton-control" type="button" aria-haspopup="dialog" aria-controls="ruleta-1">
             Gira la ruleta
         </button>
-
         <dialog id="ruleta-1" class="dialogo-giro-ruleta" aria-labelledby="titulo-giro-1">
             <div class="panel-resultado-ruleta">
                 <h2 id="titulo-giro-1">Gira la ruleta</h2>
@@ -144,7 +141,6 @@
         <button class="boton-control" type="button" aria-haspopup="dialog" aria-controls="ruleta-2">
             Gira la ruleta
         </button>
-
         <dialog id="ruleta-2" class="dialogo-giro-ruleta" aria-labelledby="titulo-giro-2">
             <div class="panel-resultado-ruleta">
                 <h2 id="titulo-giro-2">Gira la ruleta</h2>
@@ -212,9 +208,7 @@
         <button id="activar-microfono" class="boton-control" type="button" aria-pressed="false">
             Activar micrófono
         </button>
-        <p id="estado-microfono" class="estado-control" role="status">
-            El micrófono está apagado.
-        </p>
+        <p id="estado-microfono" class="estado-control" role="status">El micrófono está apagado.</p>
         <label for="nivel-soplido">Volumen del micrófono</label>
         <meter id="nivel-soplido" class="medidor-control" min="0" max="1" value="0"></meter>
     </section>
@@ -258,10 +252,7 @@
 
     <section>
         <h1>Desde ahora, cada tirada de dados vale dos gemas</h1>
-        <p>
-            Sabes que el celador es un estafador,
-            pero de verdad quieres ayudar a Charrito.
-        </p>
+        <p>Sabes que el celador es un estafador, pero de verdad quieres ayudar a Charrito.</p>
     </section>
 
     <section>
@@ -320,10 +311,7 @@
 
     <section>
         <h1>¡Lo lograste por fin!</h1>
-        <p>
-            Lograste vencer al celador,
-            pero a Charrito solo le queda una gema.
-        </p>
+        <p>Lograste vencer al celador, pero a Charrito solo le queda una gema.</p>
     </section>
 
     <!-- CARTAS -->
@@ -331,8 +319,7 @@
         <h1>El enfrentamiento definitivo con el borracho ha llegado</h1>
         <p>
             Él te confronta con una revelación aterradora:
-            bajo estas tres cartas yacen los tres posibles
-            destinos de Charrito.
+            bajo estas tres cartas yacen los tres posibles destinos de Charrito.
         </p>
         <div class="contenedor-imagen3">
             <img src="assets/borracho-malvado.png" alt="Borracho">
@@ -383,10 +370,7 @@
         </p>
         <label for="nivel-luz">Brillo detectado</label>
         <meter id="nivel-luz" class="medidor-control" min="0" max="255" value="0"></meter>
-        <p class="nota">
-            La imagen se analiza en tu dispositivo.
-            No se graba ni se envía.
-        </p>
+        <p class="nota">La imagen se analiza en tu dispositivo. No se graba ni se envía.</p>
         <p class="nota nota-cartas"></p>
         <video id="video-luz" class="video-analisis" autoplay muted playsinline aria-hidden="true"></video>
     </section>
@@ -418,6 +402,10 @@
         <div class="panel-resultado-ruleta">
             <h2 id="titulo-resultado-dados">Resultado de la tirada</h2>
             <div id="imagenes-resultado-dados" class="imagenes-resultado-dados"></div>
+            <audio id="audio-resultado-dados" src="./assets/dado-antes.wav" preload="auto"></audio>
+            <button id="reproducir-resultado-dados" class="boton-control" type="button" hidden>
+                Reproducir sonido
+            </button>
             <form method="dialog">
                 <button class="boton-control" type="submit" autofocus>Continuar</button>
             </form>
