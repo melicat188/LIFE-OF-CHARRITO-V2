@@ -4,11 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Life of Charrito</title>
-
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
-    <link rel="stylesheet" href="./style.css?v=26">
-
-    <script src="./script.js?v=28" defer></script>
+    <link rel="stylesheet" href="./style.css?v=27">
+    <script src="./script.js?v=29" defer></script>
     <script src="./camara.js?v=2" defer></script>
 </head>
 <body>
@@ -118,7 +116,6 @@
             <div class="panel-resultado-ruleta">
                 <h2 id="titulo-giro-1">Gira la ruleta</h2>
                 <p>Arrastra la ruleta con el dedo para girarla.</p>
-
                 <div class="ruleta" data-resultado="perdida">
                     <img
                         class="imagen-ruleta"
@@ -128,7 +125,6 @@
                         draggable="false"
                     >
                 </div>
-
                 <form method="dialog">
                     <button class="boton-control" type="submit">Cerrar</button>
                 </form>
@@ -153,7 +149,6 @@
             <div class="panel-resultado-ruleta">
                 <h2 id="titulo-giro-2">Gira la ruleta</h2>
                 <p>Gira la ruleta con la última gema de Charrito.</p>
-
                 <div class="ruleta" data-resultado="ganancia">
                     <img
                         class="imagen-ruleta"
@@ -163,7 +158,6 @@
                         draggable="false"
                     >
                 </div>
-
                 <form method="dialog">
                     <button class="boton-control" type="submit">Cerrar</button>
                 </form>
@@ -181,10 +175,7 @@
 
     <section>
         <h1>Charrito le paga las gemas al informante...</h1>
-        <p>
-            Quien les otorga la información sobre el escondite
-            del Borracho Malvado.
-        </p>
+        <p>Quien les otorga la información sobre el escondite del Borracho Malvado.</p>
         <p>
             Él se encuentra en un lugar llamado la Taverna del Vicio.
             Este espacio es conocido por esta triste razón:
@@ -214,12 +205,10 @@
     <section id="seccion-soplido">
         <h1>Sopla los dados por el buen augurio</h1>
         <p>Activa el micrófono y sopla suavemente hacia él.</p>
-
         <div class="contenedor-dados" id="dados-soplido">
             <img class="dado" src="assets/dado.png" alt="Primer dado para soplar" draggable="false">
             <img class="dado" src="assets/dado.png" alt="Segundo dado para soplar" draggable="false">
         </div>
-
         <button id="activar-microfono" class="boton-control" type="button" aria-pressed="false">
             Activar micrófono
         </button>
@@ -234,12 +223,10 @@
     <section class="seccion-sacudida" data-dado-resultado="assets/dado2.png">
         <h1>Debes sacudir para tirar...</h1>
         <p>Toca “Activar movimiento” y sacude suavemente tu celular.</p>
-
         <div class="contenedor-dados">
             <img class="dado" src="assets/dado.png" alt="Primer dado de la primera tirada" draggable="false">
             <img class="dado" src="assets/dado.png" alt="Segundo dado de la primera tirada" draggable="false">
         </div>
-
         <button class="activar-movimiento boton-control" type="button" aria-pressed="false">
             Activar movimiento
         </button>
@@ -285,12 +272,10 @@
     <section class="seccion-sacudida" data-dado-resultado="assets/dado3.png">
         <h1>Segunda tirada</h1>
         <p>Activa el movimiento y vuelve a sacudir el celular.</p>
-
         <div class="contenedor-dados">
             <img class="dado" src="assets/dado.png" alt="Primer dado de la segunda tirada" draggable="false">
             <img class="dado" src="assets/dado.png" alt="Segundo dado de la segunda tirada" draggable="false">
         </div>
-
         <button class="activar-movimiento boton-control" type="button" aria-pressed="false">
             Activar movimiento
         </button>
@@ -316,12 +301,10 @@
     <section class="seccion-sacudida" data-dado-resultado="assets/dado4.png">
         <h1>Tercera tirada</h1>
         <p>Activa el movimiento y sacude una vez más.</p>
-
         <div class="contenedor-dados">
             <img class="dado" src="assets/dado.png" alt="Primer dado de la tercera tirada" draggable="false">
             <img class="dado" src="assets/dado.png" alt="Segundo dado de la tercera tirada" draggable="false">
         </div>
-
         <button class="activar-movimiento boton-control" type="button" aria-pressed="false">
             Activar movimiento
         </button>
@@ -425,6 +408,16 @@
         <div class="panel-resultado-ruleta">
             <h2 id="titulo-resultado-ruleta"></h2>
             <div id="gemas-resultado-ruleta" class="gemas-resultado-ruleta" role="img"></div>
+            <form method="dialog">
+                <button class="boton-control" type="submit" autofocus>Continuar</button>
+            </form>
+        </div>
+    </dialog>
+
+    <dialog id="resultado-dados" aria-labelledby="titulo-resultado-dados">
+        <div class="panel-resultado-ruleta">
+            <h2 id="titulo-resultado-dados">Resultado de la tirada</h2>
+            <div id="imagenes-resultado-dados" class="imagenes-resultado-dados"></div>
             <form method="dialog">
                 <button class="boton-control" type="submit" autofocus>Continuar</button>
             </form>

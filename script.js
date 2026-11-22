@@ -58,7 +58,6 @@
             try {
                 const pista = await pistas[nombre];
 
-                // El movimiento pudo terminar mientras se cargaba el audio.
                 if (reproduciendo.get(clave) !== turno) return;
 
                 if (!pista) {
@@ -132,12 +131,10 @@
     const dialogoRuleta = document.getElementById("resultado-ruleta");
     const tituloResultado = document.getElementById("titulo-resultado-ruleta");
     const gemasResultado = document.getElementById("gemas-resultado-ruleta");
-
     const resultadosRuleta = {
         perdida: { mensaje: "Pierdes dos gemas", cantidad: 1, etiqueta: "Una gema" },
         ganancia: { mensaje: "Ganaste cinco gemas", cantidad: 5, etiqueta: "Cinco gemas" }
     };
-
     const giroMinimo = 15;
 
     document.querySelectorAll(".ruleta").forEach((contenedor) => {
@@ -489,10 +486,7 @@
             }
 
             const volumen = Math.sqrt(suma / datos.length);
-            const objetivo = Math.max(
-                0,
-                Math.min(1, (volumen - 0.025) / (0.18 - 0.025))
-            );
+            const objetivo = Math.max(0, Math.min(1, (volumen - 0.025) / (0.18 - 0.025)));
 
             intensidad += (objetivo - intensidad) * 0.18;
             medidor.value = intensidad;
@@ -554,7 +548,6 @@
 
                 boton.textContent = "Apagar micrófono";
                 boton.setAttribute("aria-pressed", "true");
-
                 estado.textContent = preferenciaMovimiento.matches
                     ? "Micrófono activo. Movimiento reducido activado: observa la barra."
                     : "Micrófono activo. ¡Sopla para mover los dados!";
@@ -599,6 +592,8 @@
     (() => {
         const umbralSacudida = 0.06;
         const pausaParaMostrarResultado = 700;
+        const dialogoDados = document.getElementById("resultado-dados");
+        const imagenesResultado = document.getElementById("imagenes-resultado-dados");
         let detenerActual = null;
 
         document.querySelectorAll(".seccion-sacudida").forEach((seccion) => {
@@ -624,7 +619,8 @@
             let ultimaSacudida = null;
             let ultimoMovimientoSonoro = null;
             let sonidoDadosUsado = false;
-            let resultadoSolicitado = false;
+            let cargandoResultado = false;
+            let resultadoMostrado = false;
 
             function actualizarNota() {
                 if (!nota) return;
@@ -645,6 +641,7 @@
                 version += 1;
                 activo = false;
                 iniciando = false;
+                cargandoResultado = false;
 
                 window.removeEventListener("devicemotion", detectar);
                 clearTimeout(temporizador);
@@ -705,8 +702,8 @@
                     const tiempo = ultimaLectura === null
                         ? 16.67
                         : Math.min(ahora - ultimaLectura, 100);
-
                     const filtro = Math.exp(-tiempo / 250);
+
                     gravedad.x = filtro * gravedad.x + (1 - filtro) * vector.x;
                     gravedad.y = filtro * gravedad.y + (1 - filtro) * vector.y;
                     gravedad.z = filtro * gravedad.z + (1 - filtro) * vector.z;
@@ -743,26 +740,50 @@
                         ultimoMovimientoSonoro = ahora;
                     }
 
-                    if (!resultadoSolicitado) ultimaSacudida = ahora;
+                    if (!resultadoMostrado) ultimaSacudida = ahora;
                 }
             }
 
             function mostrarResultado() {
-                resultadoSolicitado = true;
-                ultimaSacudida = null;
+                if (typeof dialogoDados?.showModal !== "function" || !imagenesResultado) {
+                    resultadoMostrado = true;
+                    estado.textContent = "No se pudo abrir el cuadro del resultado.";
+                    return;
+                }
 
+                cargandoResultado = true;
+                const solicitud = version;
                 const imagen = new Image();
 
                 imagen.onload = () => {
-                    dados.forEach((dado) => {
-                        dado.src = imagenResultado;
-                    });
+                    if (solicitud !== version) return;
+                    cargandoResultado = false;
 
-                    if (activo) estado.textContent = "Resultado de la tirada.";
+                    if (
+                        !activo ||
+                        !estaVisible(seccion) ||
+                        document.querySelector("dialog[open]") ||
+                        performance.now() - ultimaSacudida < pausaParaMostrarResultado
+                    ) {
+                        return;
+                    }
+
+                    imagen.alt = "Primer dado del resultado";
+                    const segundaImagen = imagen.cloneNode();
+                    segundaImagen.alt = "Segundo dado del resultado";
+
+                    imagenesResultado.replaceChildren(imagen, segundaImagen);
+                    dialogoDados.showModal();
+                    resultadoMostrado = true;
+                    ultimaSacudida = null;
+                    estado.textContent = "Resultado de la tirada.";
                 };
 
                 imagen.onerror = () => {
-                    resultadoSolicitado = false;
+                    if (solicitud !== version) return;
+
+                    cargandoResultado = false;
+                    ultimaSacudida = null;
                     estado.textContent =
                         `No se pudo cargar ${imagenResultado}. Revisa el nombre y la extensión del archivo.`;
                 };
@@ -796,9 +817,11 @@
 
                 if (
                     imagenResultado &&
-                    !resultadoSolicitado &&
+                    !cargandoResultado &&
+                    !resultadoMostrado &&
                     ultimaSacudida !== null &&
-                    ahora - ultimaSacudida >= pausaParaMostrarResultado
+                    ahora - ultimaSacudida >= pausaParaMostrarResultado &&
+                    !document.querySelector("dialog[open]")
                 ) {
                     mostrarResultado();
                 }
