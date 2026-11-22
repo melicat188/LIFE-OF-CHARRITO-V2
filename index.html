@@ -4,12 +4,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Life of Charrito</title>
+
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
     <link rel="stylesheet" href="./style.css?v=30">
+
     <script src="./script.js?v=32" defer></script>
     <script src="./camara.js?v=2" defer></script>
+    <script src="./contador-gemas.js?v=1" defer></script>
+
+    <style>
+        .contador-gemas {
+            position: fixed;
+            top: calc(12px + env(safe-area-inset-top, 0px));
+            right: calc(12px + env(safe-area-inset-right, 0px));
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            border: 1px solid #555;
+            border-radius: 8px;
+            background-color: #171717;
+            color: white;
+            font-size: 11px;
+            line-height: 1.4;
+            white-space: nowrap;
+            pointer-events: none;
+        }
+
+        .contador-gemas img {
+            display: block;
+            width: 22px;
+            height: 22px;
+            object-fit: contain;
+        }
+    </style>
 </head>
 <body>
+    <div class="contador-gemas">
+        <img src="assets/image.png" alt="" width="22" height="22">
+        <span id="saldo-gemas" role="status">3 gemas</span>
+    </div>
+
     <section>
         <h1>Life of Charrito</h1>
         <p>Desliza ↓</p>
@@ -260,7 +296,7 @@
     </section>
 
     <!-- SEGUNDA SACUDIDA -->
-    <section class="seccion-sacudida" data-dado-resultado="assets/dado3.png">
+    <section class="seccion-sacudida" data-dado-resultado="assets/dado3.png" data-saldo-gemas="3">
         <h1>Segunda tirada</h1>
         <p>Activa el movimiento y vuelve a sacudir el celular.</p>
         <div class="contenedor-dados">
@@ -289,7 +325,7 @@
     </section>
 
     <!-- TERCERA SACUDIDA -->
-    <section class="seccion-sacudida" data-dado-resultado="assets/dado4.png">
+    <section class="seccion-sacudida" data-dado-resultado="assets/dado4.png" data-saldo-gemas="1">
         <h1>Tercera tirada</h1>
         <p>Activa el movimiento y sacude una vez más.</p>
         <div class="contenedor-dados">
