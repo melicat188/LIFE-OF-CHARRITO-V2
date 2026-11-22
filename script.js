@@ -21,7 +21,8 @@
         const pistas = {
             dados: cargar("./assets/dados-audio.mpeg"),
             ruleta: cargar("./assets/ruleta-audio.mpeg"),
-            gemas: cargar("./assets/gemas-audio.mpeg")
+            gemas: cargar("./assets/gemas-audio.mpeg"),
+            resultadoDados: cargar("./assets/dado-antes.wav")
         };
         const reproduciendo = new Map();
 
@@ -769,11 +770,14 @@
                     }
 
                     imagen.alt = "Primer dado del resultado";
+
                     const segundaImagen = imagen.cloneNode();
                     segundaImagen.alt = "Segundo dado del resultado";
 
                     imagenesResultado.replaceChildren(imagen, segundaImagen);
                     dialogoDados.showModal();
+                    efectos.reproducir("resultadoDados", imagen);
+
                     resultadoMostrado = true;
                     ultimaSacudida = null;
                     estado.textContent = "Resultado de la tirada.";
@@ -883,7 +887,6 @@
 
                     activo = true;
                     iniciando = false;
-
                     boton.textContent = "Apagar movimiento";
                     boton.setAttribute("aria-pressed", "true");
                     estado.textContent = "Esperando datos. Mueve suavemente el celular.";
@@ -976,7 +979,6 @@
                 if (cantidad >= letras.length) {
                     elemento.textContent = texto;
                     indice += 1;
-
                     if (indice === dialogos.length) return;
 
                     inicio = undefined;
