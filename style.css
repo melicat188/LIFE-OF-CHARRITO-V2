@@ -448,3 +448,18 @@ p {
 #resultado-dados img[src$="dado4.png"] {
     transform: scale(1.15);
 }
+
+#resultado-dados .imagenes-resultado-dados:has(
+    img[src$="dado3.png"],
+    img[src$="dado4.png"]
+) {
+    gap: 20px;
+}
+
+#resultado-dados img[src$="dado3.png"],
+#resultado-dados img[src$="dado4.png"] {
+    flex: 0 1 80px;
+    width: 80px;
+    max-width: calc((100% - 20px) / 2);
+    transform: none;
+}
