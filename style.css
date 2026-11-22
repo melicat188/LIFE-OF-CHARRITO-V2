@@ -97,17 +97,9 @@ p {
 
 /* SECCIONES FIJAS */
 
-.tramo-pausa {
-    height: 220vh;
-    height: 220svh;
-}
+
 
 .seccion-fija {
-    position: sticky;
-    top: 0;
-    height: 100vh;
-    height: 100svh;
-    min-height: 0;
     gap: 12px;
     padding: 16px 20px;
     background-color: black;

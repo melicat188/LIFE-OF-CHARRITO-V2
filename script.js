@@ -144,7 +144,12 @@
         const imagen = contenedor.querySelector(".imagen-ruleta");
         if (!imagen) return;
 
+        const dialogoGiro = contenedor.closest(".dialogo-giro-ruleta");
+        const botonAbrir = dialogoGiro && document.querySelector(
+            `[aria-controls="${dialogoGiro.id}"]`
+        );
         const resultado = resultadosRuleta[contenedor.dataset.resultado];
+
         let resultadoMostrado = false;
         let sonidoUsado = false;
         let temporizadorTeclado = null;
@@ -158,6 +163,30 @@
         let animacion = null;
         let centroX = 0;
         let centroY = 0;
+
+        botonAbrir?.addEventListener("click", () => {
+            if (!dialogoGiro.open && typeof dialogoGiro.showModal === "function") {
+                dialogoGiro.showModal();
+            }
+        });
+
+        dialogoGiro?.addEventListener("close", () => {
+            if (dialogoGiro.open) return;
+
+            clearTimeout(temporizadorTeclado);
+            temporizadorTeclado = null;
+
+            const puntero = punteroActivo;
+            punteroActivo = null;
+            anguloAnterior = null;
+            contenedor.classList.remove("arrastrando");
+
+            if (puntero !== null && contenedor.hasPointerCapture(puntero)) {
+                contenedor.releasePointerCapture(puntero);
+            }
+
+            detenerInercia();
+        });
 
         function dibujar() {
             imagen.style.transform = `rotate(${rotacion}deg)`;
@@ -173,6 +202,7 @@
         function mostrarResultado() {
             if (
                 resultadoMostrado ||
+                (dialogoGiro && !dialogoGiro.open) ||
                 !resultado ||
                 typeof dialogoRuleta?.showModal !== "function" ||
                 !tituloResultado ||
@@ -193,6 +223,7 @@
                 gemasResultado.append(gema);
             }
 
+            if (dialogoGiro?.open) dialogoGiro.close();
             dialogoRuleta.showModal();
             resultadoMostrado = true;
             efectos.reproducir("gemas", resultado);
@@ -924,6 +955,7 @@
                     indice += 1;
 
                     if (indice === dialogos.length) return;
+
                     inicio = undefined;
                 } else {
                     visible.data = letras.slice(0, cantidad).join("");

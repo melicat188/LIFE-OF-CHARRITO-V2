@@ -11,8 +11,7 @@
         if (!boton || !estado) return;
 
         if (!seccion || !medidor || !video || !cartas) {
-            estado.textContent =
-                "Faltan elementos de las cartas en el HTML.";
+            estado.textContent = "Faltan elementos de las cartas en el HTML.";
             return;
         }
 
@@ -35,9 +34,7 @@
         canvas.width = 32;
         canvas.height = 24;
 
-        const contexto = canvas.getContext("2d", {
-            willReadFrequently: true
-        });
+        const contexto = canvas.getContext("2d", { willReadFrequently: true });
 
         let flujo = null;
         let activo = false;
@@ -45,19 +42,15 @@
         let version = 0;
         let animacion = null;
         let temporizador = null;
-
         let ultimoAnalisis = null;
         let muestras = [];
         let referencia = null;
         let brilloSuavizado = null;
         let cambioDesde = null;
 
-        // Confirma que este archivo se cargó correctamente.
         estado.textContent = "Cámara lista para activar.";
 
-        function detener(
-            mensaje = "La cámara está apagada."
-        ) {
+        function detener(mensaje = "La cámara está apagada.") {
             version += 1;
             activo = false;
             iniciando = false;
@@ -89,17 +82,13 @@
 
             boton.textContent = "Activar cámara";
             boton.setAttribute("aria-pressed", "false");
-
             estado.textContent = mensaje;
         }
 
         function medirBrillo() {
             contexto.drawImage(video, 0, 0, 32, 24);
 
-            const pixeles = contexto.getImageData(
-                0, 0, 32, 24
-            ).data;
-
+            const pixeles = contexto.getImageData(0, 0, 32, 24).data;
             let suma = 0;
 
             for (let i = 0; i < pixeles.length; i += 4) {
@@ -116,23 +105,16 @@
             if (!activo) return;
 
             try {
-                const videoListo =
-                    video.readyState >= 2 &&
-                    video.videoWidth > 0;
-
-                const tocaAnalizar =
-                    ultimoAnalisis === null ||
-                    ahora - ultimoAnalisis >= 120;
+                const videoListo = video.readyState >= 2 && video.videoWidth > 0;
+                const tocaAnalizar = ultimoAnalisis === null || ahora - ultimoAnalisis >= 120;
 
                 if (videoListo && tocaAnalizar) {
                     ultimoAnalisis = ahora;
 
                     const brillo = medirBrillo();
-
                     brilloSuavizado = brilloSuavizado === null
                         ? brillo
-                        : brilloSuavizado +
-                          (brillo - brilloSuavizado) * 0.3;
+                        : brilloSuavizado + (brillo - brilloSuavizado) * 0.3;
 
                     medidor.value = brilloSuavizado;
 
@@ -154,21 +136,13 @@
                                 : "¡Listo! Destapa la cámara o busca más luz para voltear las cartas.";
                         }
                     } else {
-                        // Ignora pequeñas variaciones del brillo.
-                        const margen = Math.max(
-                            10,
-                            referencia * 0.15
-                        );
-
-                        const reveladas =
-                            cartas.classList.contains("reveladas");
+                        const margen = Math.max(10, referencia * 0.15);
+                        const reveladas = cartas.classList.contains("reveladas");
 
                         // Diferentes umbrales evitan parpadeos.
                         const debeCambiar = reveladas
-                            ? brilloSuavizado <
-                              referencia + margen * 0.35
-                            : brilloSuavizado >
-                              referencia + margen;
+                            ? brilloSuavizado < referencia + margen * 0.35
+                            : brilloSuavizado > referencia + margen;
 
                         if (debeCambiar) {
                             if (cambioDesde === null) {
@@ -176,10 +150,7 @@
                             }
 
                             if (ahora - cambioDesde >= 400) {
-                                cartas.classList.toggle(
-                                    "reveladas",
-                                    !reveladas
-                                );
+                                cartas.classList.toggle("reveladas", !reveladas);
 
                                 estado.textContent = reveladas
                                     ? "La luz bajó. Deja entrar más luz para voltearlas otra vez."
@@ -195,9 +166,7 @@
 
                 animacion = requestAnimationFrame(analizar);
             } catch (error) {
-                detener(
-                    "No se pudo analizar la imagen de la cámara."
-                );
+                detener("No se pudo analizar la imagen de la cámara.");
             }
         }
 
@@ -216,13 +185,11 @@
             }
 
             if (!contexto) {
-                estado.textContent =
-                    "Este navegador no permite analizar la imagen.";
+                estado.textContent = "Este navegador no permite analizar la imagen.";
                 return;
             }
 
             const solicitud = ++version;
-
             iniciando = true;
             boton.textContent = "Cancelar activación";
 
@@ -238,20 +205,17 @@
                 estado.textContent =
                     "Permite el acceso a la cámara cuando Chrome lo solicite.";
 
-                const nuevoFlujo =
-                    await navigator.mediaDevices.getUserMedia({
-                        audio: false,
-                        video: {
-                            facingMode: { exact: "user" },
-                            width: { ideal: 320 },
-                            height: { ideal: 240 }
-                        }
-                    });
+                const nuevoFlujo = await navigator.mediaDevices.getUserMedia({
+                    audio: false,
+                    video: {
+                        facingMode: { exact: "user" },
+                        width: { ideal: 320 },
+                        height: { ideal: 240 }
+                    }
+                });
 
                 if (solicitud !== version) {
-                    nuevoFlujo.getTracks().forEach(
-                        (pista) => pista.stop()
-                    );
+                    nuevoFlujo.getTracks().forEach((pista) => pista.stop());
                     return;
                 }
 
@@ -274,16 +238,13 @@
 
                 boton.textContent = "Apagar cámara";
                 boton.setAttribute("aria-pressed", "true");
-
                 estado.textContent =
                     "Calibrando… Mantén la cámara parcialmente cubierta durante unos dos segundos.";
 
                 flujo.getVideoTracks().forEach((pista) => {
                     pista.addEventListener("ended", () => {
                         if (solicitud === version) {
-                            detener(
-                                "Se interrumpió la cámara. Puedes activarla de nuevo."
-                            );
+                            detener("Se interrumpió la cámara. Puedes activarla de nuevo.");
                         }
                     });
                 });
@@ -295,14 +256,11 @@
                 let mensaje = "No se pudo activar la cámara.";
 
                 if (error.name === "NotAllowedError") {
-                    mensaje =
-                        "Permite la cámara en los ajustes de este sitio en Chrome.";
+                    mensaje = "Permite la cámara en los ajustes de este sitio en Chrome.";
                 } else if (error.name === "NotFoundError") {
-                    mensaje =
-                        "No se encontró una cámara disponible.";
+                    mensaje = "No se encontró una cámara disponible.";
                 } else if (error.name === "NotReadableError") {
-                    mensaje =
-                        "La cámara está ocupada o no está disponible.";
+                    mensaje = "La cámara está ocupada o no está disponible.";
                 }
 
                 detener(mensaje);
@@ -326,10 +284,7 @@
         if ("IntersectionObserver" in window) {
             const observador = new IntersectionObserver((entradas) => {
                 for (const entrada of entradas) {
-                    if (
-                        !entrada.isIntersecting &&
-                        (activo || iniciando)
-                    ) {
+                    if (!entrada.isIntersecting && (activo || iniciando)) {
                         detener();
                     }
                 }
