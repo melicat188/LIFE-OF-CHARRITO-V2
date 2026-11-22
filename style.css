@@ -95,9 +95,7 @@ p {
     }
 }
 
-/* SECCIONES FIJAS */
-
-
+/* SECCIONES DE RULETA */
 
 .seccion-fija {
     gap: 12px;
@@ -115,10 +113,6 @@ p {
     margin: 0;
     font-size: 16px;
     line-height: 1.4;
-}
-
-.seccion-fija .indicacion-scroll {
-    font-size: 14px;
 }
 
 /* RULETAS */
@@ -159,9 +153,11 @@ p {
     filter: brightness(1.25);
 }
 
-/* RESULTADOS DE LAS RULETAS */
+/* POPUPS DE GIRO Y RESULTADO */
 
-#resultado-ruleta[open] {
+#resultado-ruleta[open],
+.dialogo-giro-ruleta[open],
+#resultado-dados[open] {
     position: fixed;
     inset: 0;
     width: 100%;
@@ -179,7 +175,9 @@ p {
     place-items: center;
 }
 
-#resultado-ruleta::backdrop {
+#resultado-ruleta::backdrop,
+.dialogo-giro-ruleta::backdrop,
+#resultado-dados::backdrop {
     background-color: rgb(0 0 0 / 75%);
 }
 
@@ -203,6 +201,15 @@ p {
     overflow-wrap: anywhere;
 }
 
+.dialogo-giro-ruleta .panel-resultado-ruleta {
+    width: min(340px, 100%);
+}
+
+.dialogo-giro-ruleta .ruleta {
+    margin: 12px auto;
+    max-width: 100%;
+}
+
 .gemas-resultado-ruleta {
     display: flex;
     justify-content: center;
@@ -222,6 +229,22 @@ p {
 .panel-resultado-ruleta .boton-control {
     font-size: 11px;
     line-height: 1.5;
+}
+
+.imagenes-resultado-dados {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin: 16px 0;
+}
+
+.imagenes-resultado-dados img {
+    flex: 0 1 88px;
+    width: 88px;
+    max-width: calc((100% - 12px) / 2);
+    min-width: 0;
+    aspect-ratio: 1;
+    object-fit: contain;
 }
 
 /* DADOS */
@@ -406,10 +429,6 @@ p {
         width: min(180px, 35svh);
         height: min(180px, 35svh);
     }
-
-    .seccion-fija .indicacion-scroll {
-        font-size: 12px;
-    }
 }
 
 /* MOVIMIENTO REDUCIDO */
@@ -423,4 +442,9 @@ p {
     .carta-interior {
         transition: none;
     }
+}
+
+#resultado-dados img[src$="dado3.png"],
+#resultado-dados img[src$="dado4.png"] {
+    transform: scale(1.15);
 }
