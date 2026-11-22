@@ -463,3 +463,18 @@ p {
     max-width: calc((100% - 20px) / 2);
     transform: none;
 }
+
+.contenedor-imagen3 img {
+    display: block;
+    width: min(65vw, 300px);
+    max-width: 100%;
+    height: auto;
+    margin: 0 auto;
+    image-rendering: pixelated;
+}
+
+.dialogo-largo {
+    width: min(100%, 600px);
+    text-align: justify;
+    hyphens: auto;
+}
