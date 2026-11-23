@@ -10,7 +10,7 @@
 
         if (!AudioDisponible) {
 
-            return { reproducir() {}, detener() {} };
+            return { async reproducir() { return false; }, detener() {} };
 
         }
 
@@ -22,7 +22,7 @@
 
         } catch {
 
-            return { reproducir() {}, detener() {} };
+            return { async reproducir() { return false; }, detener() {} };
 
         }
 
@@ -32,7 +32,9 @@
 
             ruleta: cargar("./assets/ruleta-audio.mpeg"),
 
-            gemas: cargar("./assets/gemas-audio.mpeg")
+            gemas: cargar("./assets/gemas-audio.mpeg"),
+
+            resultadoDados: cargar("./assets/dado-antes.wav")
 
         };
 
@@ -80,7 +82,7 @@
 
         async function reproducir(nombre, clave = nombre) {
 
-            if (reproduciendo.has(clave)) return;
+            if (reproduciendo.has(clave)) return true;
 
             const turno = { fuente: null };
 
@@ -90,13 +92,13 @@
 
                 const pista = await pistas[nombre];
 
-                if (reproduciendo.get(clave) !== turno) return;
+                if (reproduciendo.get(clave) !== turno) return false;
 
-                if (!pista) {
+                if (!pista || (nombre === "resultadoDados" && contexto.state !== "running")) {
 
                     reproduciendo.delete(clave);
 
-                    return;
+                    return false;
 
                 }
 
@@ -122,6 +124,8 @@
 
                 turno.fuente = fuente;
 
+                return true;
+
             } catch (error) {
 
                 if (reproduciendo.get(clave) === turno) {
@@ -131,6 +135,8 @@
                 }
 
                 console.warn(`No se pudo reproducir el efecto ${nombre}.`, error);
+
+                return false;
 
             }
 
@@ -1434,13 +1440,23 @@
 
                 dialogoDados.addEventListener("close", () => {
 
+                    efectos.detener(dialogoDados);
+
+                    audioResultado?.pause();
+
                     musicaCasino(dialogoDados, false);
 
                 }, { once: true });
 
                 avanzarAlCerrar(dialogoDados, seccion);
 
-                sonarResultadoDados();
+                if (botonAudioResultado) botonAudioResultado.hidden = true;
+
+                efectos.reproducir("resultadoDados", dialogoDados).then((reproducido) => {
+
+                    if (!reproducido && dialogoDados.open) sonarResultadoDados();
+
+                });
 
             }
 
