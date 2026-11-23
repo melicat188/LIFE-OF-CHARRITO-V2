@@ -51,6 +51,9 @@
         estado.textContent = "Cámara lista para activar.";
 
         function detener(mensaje = "La cámara está apagada.") {
+            document.dispatchEvent(new CustomEvent("musica-casino", {
+                detail: { origen: boton, activa: false }
+            }));
             version += 1;
             activo = false;
             iniciando = false;
@@ -192,6 +195,9 @@
             const solicitud = ++version;
             iniciando = true;
             boton.textContent = "Cancelar activación";
+            document.dispatchEvent(new CustomEvent("musica-casino", {
+                detail: { origen: boton, activa: true }
+            }));
 
             temporizador = setTimeout(() => {
                 if (solicitud === version) {
