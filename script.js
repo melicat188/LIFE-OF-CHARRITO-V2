@@ -772,8 +772,6 @@
 
         function detener(mensaje = "El micrófono está apagado.") {
 
-            musicaCasino(boton, false);
-
             version += 1;
 
             activo = false;
@@ -968,8 +966,6 @@
 
             }
 
-            musicaCasino(boton, true);
-
             try {
 
                 const contexto = new AudioDisponible();
@@ -1007,8 +1003,6 @@
                 await reanudacion;
 
                 if (solicitud !== version) return;
-
-                musicaCasino(boton, true);
 
                 analizador = contexto.createAnalyser();
 
