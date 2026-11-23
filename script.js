@@ -1108,6 +1108,8 @@
 
         const pausaParaMostrarResultado = 700;
 
+        const duracionMaximaTirada = 2400;
+
         const dialogoDados = document.getElementById("resultado-dados");
 
         const imagenesResultado = document.getElementById("imagenes-resultado-dados");
@@ -1176,13 +1178,13 @@
 
             let datosRecibidos = false;
 
+            let primeraSacudida = null;
+
             let ultimaSacudida = null;
 
             let ultimoMovimientoSonoro = null;
 
             let sonidoDadosUsado = false;
-
-            let cargandoResultado = false;
 
             let resultadoMostrado = false;
 
@@ -1218,8 +1220,6 @@
 
                 iniciando = false;
 
-                cargandoResultado = false;
-
                 window.removeEventListener("devicemotion", detectar);
 
                 clearTimeout(temporizador);
@@ -1243,6 +1243,8 @@
                 gravedad = null;
 
                 datosRecibidos = false;
+
+                primeraSacudida = null;
 
                 ultimaSacudida = null;
 
@@ -1376,7 +1378,13 @@
 
                     }
 
-                    if (!resultadoMostrado) ultimaSacudida = ahora;
+                    if (!resultadoMostrado) {
+
+                        primeraSacudida ??= ahora;
+
+                        ultimaSacudida = ahora;
+
+                    }
 
                 }
 
@@ -1394,81 +1402,45 @@
 
                 }
 
-                cargandoResultado = true;
-
-                const solicitud = version;
-
                 const imagen = new Image();
 
-                imagen.onload = () => {
-
-                    if (solicitud !== version) return;
-
-                    cargandoResultado = false;
-
-                    if (
-
-                        !activo ||
-
-                        !estaVisible(seccion) ||
-
-                        document.querySelector("dialog[open]") ||
-
-                        performance.now() - ultimaSacudida < pausaParaMostrarResultado
-
-                    ) {
-
-                        return;
-
-                    }
-
-                    imagen.alt = "Primer dado del resultado";
-
-                    const segundaImagen = imagen.cloneNode();
-
-                    segundaImagen.alt = "Segundo dado del resultado";
-
-                    imagenesResultado.replaceChildren(imagen, segundaImagen);
-
-                    dialogoDados.showModal();
-
-                    musicaCasino(dialogoDados, true);
-
-                    musicaCasino(seccion, false);
-
-                    dialogoDados.addEventListener("close", () => {
-
-                        musicaCasino(dialogoDados, false);
-
-                    }, { once: true });
-
-                    avanzarAlCerrar(dialogoDados, seccion);
-
-                    sonarResultadoDados();
-
-                    resultadoMostrado = true;
-
-                    ultimaSacudida = null;
-
-                    estado.textContent = "Resultado de la tirada.";
-
-                };
-
-                imagen.onerror = () => {
-
-                    if (solicitud !== version) return;
-
-                    cargandoResultado = false;
-
-                    ultimaSacudida = null;
-
-                    estado.textContent =
-
-                        `No se pudo cargar ${imagenResultado}. Revisa el nombre y la extensión del archivo.`;
-
-                };
+                imagen.alt = "Primer dado del resultado";
 
                 imagen.src = imagenResultado;
+
+                const segundaImagen = imagen.cloneNode();
+
+                segundaImagen.alt = "Segundo dado del resultado";
+
+                imagenesResultado.replaceChildren(imagen, segundaImagen);
+
+                dialogoDados.showModal();
+
+                resultadoMostrado = true;
+
+                primeraSacudida = null;
+
+                ultimaSacudida = null;
+
+                estado.textContent = "Resultado de la tirada.";
+
+                efectos.detener(seccion);
+
+                ultimoMovimientoSonoro = null;
+
+                musicaCasino(dialogoDados, true);
+
+                musicaCasino(seccion, false);
+
+                dialogoDados.addEventListener("close", () => {
+
+                    musicaCasino(dialogoDados, false);
+
+                }, { once: true });
+
+                avanzarAlCerrar(dialogoDados, seccion);
+
+                sonarResultadoDados();
 
             }
 
@@ -1510,13 +1482,17 @@
 
                     imagenResultado &&
 
-                    !cargandoResultado &&
-
                     !resultadoMostrado &&
 
                     ultimaSacudida !== null &&
 
-                    ahora - ultimaSacudida >= pausaParaMostrarResultado &&
+                    (
+
+                        ahora - ultimaSacudida >= pausaParaMostrarResultado ||
+
+                        ahora - primeraSacudida >= duracionMaximaTirada
+
+                    ) &&
 
                     !document.querySelector("dialog[open]")
 
