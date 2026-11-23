@@ -154,7 +154,7 @@
 
                                 estado.textContent = reveladas
                                     ? "La luz bajó. Deja entrar más luz para voltearlas otra vez."
-                                    : "¡Más luz! Las cartas se voltearon.";
+                                    : "Las cartas se voltearon.";
 
                                 cambioDesde = null;
                             }
