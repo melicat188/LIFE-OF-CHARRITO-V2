@@ -1357,18 +1357,15 @@
                     imagenesResultado.replaceChildren(imagen, segundaImagen);
 
                     dialogoDados.showModal();
-
-                    avanzarAlCerrar(dialogoDados, seccion);
-
+                      musicaCasino(dialogoDados, true);
                     musicaCasino(seccion, false);
 
-                    sonarResultadoDados();
+                   dialogoDados.addEventListener("close", () => {
+                musicaCasino(dialogoDados, false);
+                 }, { once: true });
 
-                    resultadoMostrado = true;
-
-                    ultimaSacudida = null;
-
-                    estado.textContent = "Resultado de la tirada.";
+avanzarAlCerrar(dialogoDados, seccion);
+sonarResultadoDados();
 
                 };
 
