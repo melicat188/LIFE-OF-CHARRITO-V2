@@ -238,6 +238,36 @@
 
     }
 
+    const perdidaGemas = document.getElementById("perdida-gemas");
+
+    if (perdidaGemas && "IntersectionObserver" in window) {
+
+        let esperaPerdida;
+
+        const observadorPerdida = new IntersectionObserver(([entrada]) => {
+
+            clearTimeout(esperaPerdida);
+
+            if (!entrada.isIntersecting) return;
+
+            esperaPerdida = setTimeout(() => {
+
+                if (document.hidden || !estaVisible(perdidaGemas) ||
+
+                    document.querySelector("dialog[open]")) return;
+
+                observadorPerdida.disconnect();
+
+                avanzarSeccion(perdidaGemas);
+
+            }, 2500);
+
+        }, { rootMargin: "-25% 0px" });
+
+        observadorPerdida.observe(perdidaGemas);
+
+    }
+
     /* RULETAS */
 
     const dialogoRuleta = document.getElementById("resultado-ruleta");
