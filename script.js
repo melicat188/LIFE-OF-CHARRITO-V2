@@ -899,6 +899,8 @@ const objetivo = Math.max(
 
             musicaCasino(boton, true);
 
+            musicaCasino (boton, false);
+
             try {
 
                 const contexto = new AudioDisponible();
