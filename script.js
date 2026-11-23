@@ -710,6 +710,8 @@
 
         let contextoAudio = null;
 
+        let tipoAudioAnterior = null;
+
         let flujo = null;
 
         let fuente = null;
@@ -774,6 +776,14 @@
 
             }
 
+            if (tipoAudioAnterior !== null) {
+
+                navigator.audioSession.type = tipoAudioAnterior;
+
+                tipoAudioAnterior = null;
+
+            }
+
             analizador = null;
 
             datos = null;
@@ -822,12 +832,17 @@
 
             const volumen = Math.sqrt(suma / datos.length);
 
-          const umbralRuido = 0.015;
-const nivelMaximo = 0.12;
-const objetivo = Math.max(
-    0,
-    Math.min(1, (volumen - umbralRuido) / (nivelMaximo - umbralRuido))
-);
+            const umbralRuido = 0.015;
+
+            const nivelMaximo = 0.12;
+
+            const objetivo = Math.max(
+
+                0,
+
+                Math.min(1, (volumen - umbralRuido) / (nivelMaximo - umbralRuido))
+
+            );
 
             intensidad += (objetivo - intensidad) * 0.18;
 
@@ -897,9 +912,27 @@ const objetivo = Math.max(
 
             estado.textContent = "Permite el acceso al micrófono…";
 
-            musicaCasino(boton, true);
+            // Safari puede mantener la reproducción al capturar el micrófono.
 
-            musicaCasino (boton, false);
+            if (navigator.audioSession) {
+
+                const tipo = navigator.audioSession.type;
+
+                try {
+
+                    navigator.audioSession.type = "play-and-record";
+
+                    tipoAudioAnterior = tipo;
+
+                } catch (error) {
+
+                    console.warn("No se pudo configurar el audio simultáneo.", error);
+
+                }
+
+            }
+
+            musicaCasino(boton, true);
 
             try {
 
@@ -907,9 +940,7 @@ const objetivo = Math.max(
 
                 contextoAudio = contexto;
 
-                await contexto.resume();
-
-                if (solicitud !== version) return;
+                const reanudacion = contexto.resume().catch(() => {});
 
                 const nuevoFlujo = await navigator.mediaDevices.getUserMedia({
 
@@ -936,6 +967,12 @@ const objetivo = Math.max(
                 }
 
                 flujo = nuevoFlujo;
+
+                await reanudacion;
+
+                if (solicitud !== version) return;
+
+                musicaCasino(boton, true);
 
                 analizador = contexto.createAnalyser();
 
@@ -1364,15 +1401,26 @@ const objetivo = Math.max(
                     imagenesResultado.replaceChildren(imagen, segundaImagen);
 
                     dialogoDados.showModal();
-                      musicaCasino(dialogoDados, true);
+
+                    musicaCasino(dialogoDados, true);
+
                     musicaCasino(seccion, false);
 
-                   dialogoDados.addEventListener("close", () => {
-                musicaCasino(dialogoDados, false);
-                 }, { once: true });
+                    dialogoDados.addEventListener("close", () => {
 
-avanzarAlCerrar(dialogoDados, seccion);
-sonarResultadoDados();
+                        musicaCasino(dialogoDados, false);
+
+                    }, { once: true });
+
+                    avanzarAlCerrar(dialogoDados, seccion);
+
+                    sonarResultadoDados();
+
+                    resultadoMostrado = true;
+
+                    ultimaSacudida = null;
+
+                    estado.textContent = "Resultado de la tirada.";
 
                 };
 
@@ -1810,8 +1858,6 @@ sonarResultadoDados();
 
     volumenCasino.connect(contexto.destination);
 
-    let fondoActivado = false;
-
     let musicaPausada = false;
 
     let casinoListo = false;
@@ -1822,7 +1868,7 @@ sonarResultadoDados();
 
         const casinoActivo = casinoListo && interacciones.size > 0;
 
-        const audible = !musicaPausada && (casinoActivo || fondoActivado);
+        const audible = !musicaPausada;
 
         volumenFondo.gain.value = audible && !casinoActivo ? 0.25 : 0;
 
@@ -1836,7 +1882,33 @@ sonarResultadoDados();
 
     }
 
+    let pistasSolicitadas = false;
+
     function iniciarMusica() {
+
+        if (!pistasSolicitadas) {
+
+            pistasSolicitadas = true;
+
+            prepararBucle("./assets/loop%20final%20v2.wav", volumenFondo).catch(() => {
+
+                mostrarEstado("No se pudo cargar loop final v2.wav.");
+
+            });
+
+            prepararBucle("./assets/loop-casino.wav", volumenCasino).then(() => {
+
+                casinoListo = true;
+
+                actualizarMusica();
+
+            }).catch((error) => {
+
+                console.warn("No se pudo cargar assets/loop-casino.wav.", error);
+
+            });
+
+        }
 
         contexto.resume().catch(() => {
 
@@ -1847,6 +1919,12 @@ sonarResultadoDados();
     }
 
     contexto.addEventListener("statechange", actualizarMusica);
+
+    document.addEventListener("click", (evento) => {
+
+        if (!boton.contains(evento.target) && !musicaPausada) iniciarMusica();
+
+    }, { once: true });
 
     document.addEventListener("musica-casino", ({ detail: { origen, activa } }) => {
 
@@ -1884,8 +1962,6 @@ sonarResultadoDados();
 
             musicaPausada = false;
 
-            fondoActivado = true;
-
             iniciarMusica();
 
         }
@@ -1915,23 +1991,5 @@ sonarResultadoDados();
     }
 
     actualizarMusica();
-
-    prepararBucle("./assets/loop%20final%20v2.wav", volumenFondo).catch(() => {
-
-        mostrarEstado("No se pudo cargar loop final v2.wav.");
-
-    });
-
-    prepararBucle("./assets/loop-casino.wav", volumenCasino).then(() => {
-
-        casinoListo = true;
-
-        actualizarMusica();
-
-    }).catch((error) => {
-
-        console.warn("No se pudo cargar assets/loop-casino.wav.", error);
-
-    });
 
 })();
