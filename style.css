@@ -478,3 +478,7 @@ p {
     text-align: justify;
     hyphens: auto;
 }
+
+.carta-reverso img {
+    transform: translate(3.4%, 3.4%) scale(1.72);
+}
