@@ -902,7 +902,7 @@
 
                 inicioSoplido = null;
 
-                if (ultimoSoplido !== null && ahora - ultimoSoplido >= 1000) {
+                if (ultimoSoplido !== null && ahora - ultimoSoplido >= 650) {
 
                     detener("¡Soplido completado!");
 
