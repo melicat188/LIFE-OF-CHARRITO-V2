@@ -1,451 +1,827 @@
 <!DOCTYPE html>
+
 <html lang="es">
+
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Life of Charrito</title>
 
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
+
     <link rel="stylesheet" href="./style.css?v=37">
 
-    <script src="./script.js?v=32" defer></script>
-    <script src="./camara.js?v=3" defer></script>
+    <script src="./script.js?v=34" defer></script>
+
+    <script src="./camara.js?v=5" defer></script>
+
     <script src="./contador-gemas.js?v=1" defer></script>
 
     <style>
+
         .contador-gemas {
+
             position: fixed;
+
             top: calc(12px + env(safe-area-inset-top, 0px));
+
             right: calc(12px + env(safe-area-inset-right, 0px));
+
             z-index: 10;
+
             display: flex;
+
             align-items: center;
+
             gap: 8px;
+
             padding: 8px 10px;
+
             border: 1px solid #555;
+
             border-radius: 8px;
+
             background-color: #171717;
+
             color: white;
+
             font-size: 11px;
+
             line-height: 1.4;
+
             white-space: nowrap;
+
             pointer-events: none;
+
         }
 
         .contador-gemas img {
+
             display: block;
+
             width: 22px;
+
             height: 22px;
+
             object-fit: contain;
+
         }
+
     </style>
+
 </head>
+
 <body>
+
     <div class="contador-gemas">
+
         <img src="assets/image.png" alt="" width="22" height="22">
+
         <span id="saldo-gemas" role="status">3 gemas</span>
+
     </div>
 
     <section>
+
         <h1>Life of Charrito</h1>
+
         <p>Desliza ↓</p>
+
         <button id="control-musica" class="boton-control" type="button">Activar música</button>
+
         <p id="estado-musica" class="estado-control" role="status" hidden></p>
+
     </section>
 
     <section>
+
         <h1>Este es Charrito</h1>
+
         <p class = "dialogo-largo" >Un héroe que combate las adicciones, como la ludopatía y el doomscroll.</p>
+
         <div class="contenedor-imagen">
+
             <img src="assets/charrito.jpeg" alt="Charrito">
+
         </div>
+
     </section>
 
     <section>
+
         <p data-escritura>-¿Y tú peleas contra todo eso?- le preguntas</p>
+
         <p data-escritura>-Contra todo eso y más, parcero.- responde Charrito.</p>
+
     </section>
 
     <section>
+
         <div class="contenedor-verdes">
+
             <img src="assets/image.png" alt="Gema verde 1">
+
             <img src="assets/image.png" alt="Gema verde 2">
+
             <img src="assets/image.png" alt="Gema verde 3">
+
         </div>
+
         <h1>En su última aventura,</h1>
+
         <p class = "dialogo-largo">
+
             Charrito salvó a la princesa del reino de Sincelejo
+
             de las adicciones y pudo recolectar una recompensa
+
             con la que el rey le agradeció.
+
         </p>
+
     </section>
 
     <section>
+
         <p data-escritura>
+
             - Majestad, no es necesario.- Le dijo Charrito al Rey cuando le otorgaron las gemas
+
         </p>
+
         <p data-escritura>
+
             -Lo es, valiente héroe. Acepta estas gemas como muestra de nuestra gratitud.- Respondió el Rey.
+
         </p>
+
     </section>
 
     <section>
+
         <p>Estas gemas son la moneda de la que depende Charrito.</p>
+
     </section>
 
     <section>
+
         <h1>Es la primera vez</h1>
+
         <p class = "dialogo-largo">
+
             que Charrito acumula tanta riqueza en sus bolsillos. Por eso, te pide que lo
+
             acompañes en su próxima aventura, para que le ayudes a no caer en la tentación
+
             de las adicciones.
+
         </p>
+
     </section>
 
     <section>
+
         <p data-escritura>-¿Estás dispuesta a ayudarme, amigo?- Te pregunta Charrito</p>
+
         <p data-escritura>Tú no dudas ni un segundo en responder. -¡Sí!-</p>
+
     </section>
 
     <section>
+
         <h1>La misión de Charrito es la siguiente:</h1>
+
         <p class = "dialogo-largo">
+
             Derrotar al malvado Borracho Apostador, él es reconocido por ser el mayor
+
             creador de tanta miseria en el mundo, causada por la ludopatía y el doomscrolling.
+
         </p>
+
     </section>
 
     <section>
+
         <h1>PRIMER TRIAL</h1>
+
         <p class = "dialogo-largo">
+
             Charrito debe pagar por una información que lo llevará
+
             al paradero del malvado Borracho Malvado.
+
         </p>
+
         <div class="contenedor-imagen">
+
             <img src="assets/informante.jpeg" alt="Informate">
+
         </div>
+
     </section>
 
     <section>
+
         <h1>PERO</h1>
+
         <p class = "dialogo-largo">
+
             Solo tiene 3 gemas...
+
             Charrito sabe que necesitará más gemas para llegar a él... La única forma
+
             de obtener más gemas es apostandolas en un juego de ruleta.
+
         </p>
+
     </section>
 
     <section>
+
         <h1>Apuestas las dos gemas de Charrito</h1>
+
     </section>
 
     <!-- PRIMERA RULETA -->
+
     <section class="seccion-fija">
+
         <h1>GIRA LA RULETA</h1>
+
         <button class="boton-control" type="button" aria-haspopup="dialog" aria-controls="ruleta-1">
+
             Gira la ruleta
+
         </button>
+
         <dialog id="ruleta-1" class="dialogo-giro-ruleta" aria-labelledby="titulo-giro-1">
+
             <div class="panel-resultado-ruleta">
+
                 <h2 id="titulo-giro-1">Gira la ruleta</h2>
+
                 <p>Arrastra la ruleta con el dedo para girarla.</p>
+
                 <div class="ruleta" data-resultado="perdida">
+
                     <img
+
                         class="imagen-ruleta"
+
                         src="assets/ruleta.png"
+
                         alt="Primera ruleta. También puedes girarla con las flechas."
+
                         tabindex="0"
+
                         draggable="false"
+
                     >
+
                 </div>
+
                 <form method="dialog">
+
                     <button class="boton-control" type="submit">Cerrar</button>
+
                 </form>
+
             </div>
+
         </dialog>
+
     </section>
 
     <section>
+
         <h1>Pierdes las dos gemas de Charrito</h1>
+
         <p class = "dialogo-largo">Pero él realmente necesita la información.</p>
+
         <p>Apuestas la última gema.</p>
+
     </section>
 
     <!-- SEGUNDA RULETA -->
+
     <section class="seccion-fija">
+
         <h1>UNA ÚLTIMA OPORTUNIDAD</h1>
+
         <button class="boton-control" type="button" aria-haspopup="dialog" aria-controls="ruleta-2">
+
             Gira la ruleta
+
         </button>
+
         <dialog id="ruleta-2" class="dialogo-giro-ruleta" aria-labelledby="titulo-giro-2">
+
             <div class="panel-resultado-ruleta">
+
                 <h2 id="titulo-giro-2">Gira la ruleta</h2>
+
                 <p>Gira la ruleta con la última gema de Charrito.</p>
+
                 <div class="ruleta" data-resultado="ganancia">
+
                     <img
+
                         class="imagen-ruleta"
+
                         src="assets/ruleta.png"
+
                         alt="Segunda ruleta. También puedes girarla con las flechas."
+
                         tabindex="0"
+
                         draggable="false"
+
                     >
+
                 </div>
+
                 <form method="dialog">
+
                     <button class="boton-control" type="submit">Cerrar</button>
+
                 </form>
+
             </div>
+
         </dialog>
+
     </section>
 
     <section>
+
         <p data-escritura>
+
             - Gracias compa, fuiste de gran ayuda, ¿estás seguro que quieres continuar?
+
             Se puede volver peligroso.-
+
         </p>
+
         <p data-escritura>- Claro que sí - Contestas entusiasmado.</p>
+
     </section>
 
     <section>
+
         <h1>Charrito le paga las gemas al informante...</h1>
+
         <p class = "dialogo-largo">Quien les otorga la información sobre el escondite del Borracho Malvado.</p>
+
         <p class = "dialogo-largo">
+
             Él se encuentra en un lugar llamado la Taverna del Vicio.
+
             Este espacio es conocido por esta triste razón:
+
             todas las personas que entran allí se quedan apostando
+
             su dinero, sus pertenencias, sus propiedades y hasta
+
             su libertad. En el peor de los casos, han llegado a apostar su vida.
+
         </p>
+
     </section>
 
     <section>
+
         <h1>SEGUNDO TRIAL</h1>
+
         <p class = "dialogo-largo">
+
             Llegamos a la Taverna del Vicio... Es una casa vieja, las tejas están rotas y los están caídos.
+
             Los recibe un celador adicto a la nicotina.
+
         </p>
+
         <p class = "dialogo-largo">
+
             El celador no le va a permitir el ingreso a Charrito,
+
             a menos que lo venza en una tirada de dados...
+
         </p>
+
         <p class = "dialogo-largo">
+
             Es muy arriesgado para Charrito, pero debe asumir
+
             este riesgo por el bien de la humanidad.
+
         </p>
+
     </section>
 
     <!-- DADOS PARA SOPLAR -->
+
     <section id="seccion-soplido">
+
         <h1>Sopla los dados por el buen augurio</h1>
+
         <p>Activa el micrófono y sopla suavemente hacia él.</p>
+
         <div class="contenedor-dados" id="dados-soplido">
+
             <img class="dado" src="assets/dado.png" alt="Primer dado para soplar" draggable="false">
+
             <img class="dado" src="assets/dado.png" alt="Segundo dado para soplar" draggable="false">
+
         </div>
+
         <button id="activar-microfono" class="boton-control" type="button" aria-pressed="false">
+
             Activar micrófono
+
         </button>
+
         <p id="estado-microfono" class="estado-control" role="status">El micrófono está apagado.</p>
+
         <label for="nivel-soplido">Volumen del micrófono</label>
+
         <meter id="nivel-soplido" class="medidor-control" min="0" max="1" value="0"></meter>
+
     </section>
 
     <!-- PRIMERA SACUDIDA -->
+
     <section class="seccion-sacudida" data-dado-resultado="assets/dado2.png">
+
         <h1>Debes sacudir para tirar...</h1>
+
         <p>Toca “Activar movimiento” y sacude suavemente tu celular.</p>
+
         <div class="contenedor-dados">
+
             <img class="dado" src="assets/dado.png" alt="Primer dado de la primera tirada" draggable="false">
+
             <img class="dado" src="assets/dado.png" alt="Segundo dado de la primera tirada" draggable="false">
+
         </div>
+
         <button class="activar-movimiento boton-control" type="button" aria-pressed="false">
+
             Activar movimiento
+
         </button>
+
         <p class="estado-movimiento estado-control" role="status">
+
             El sensor de movimiento está apagado.
+
         </p>
+
         <label>
+
             Intensidad del movimiento
+
             <meter class="nivel-sacudida medidor-control" min="0" max="1" value="0"></meter>
+
         </label>
+
         <p class="nota nota-movimiento"></p>
+
     </section>
 
     <section>
+
         <h1>
+
             No le logras ganar al celador...
+
             Charrito voltea a mirarte y te dice:
+
         </h1>
+
         <p data-escritura>
+
             -Compa... yo... tuve serios problemas
+
             con las adicciones, apuestas, vicios...
+
         </p>
+
         <p data-escritura>Debo ser fuerte para no recaer en ello...</p>
+
         <p data-escritura>
+
             Por favor... ayúdeme compita,
+
             el que no arriesga no gana.-
+
         </p>
+
     </section>
 
     <section>
+
         <h1>Desde ahora, cada tirada de dados vale dos gemas</h1>
+
         <p class = "dialogo-largo">Sabes que el celador es un estafador, pero de verdad quieres ayudar a Charrito.</p>
+
     </section>
 
     <section>
+
         <h1>Decides tirar de nuevo</h1>
+
     </section>
 
     <!-- SEGUNDA SACUDIDA -->
+
     <section class="seccion-sacudida" data-dado-resultado="assets/dado3.png" data-saldo-gemas="3">
+
         <h1>Segunda tirada</h1>
+
         <p>Activa el movimiento y vuelve a sacudir el celular.</p>
+
         <div class="contenedor-dados">
+
             <img class="dado" src="assets/dado.png" alt="Primer dado de la segunda tirada" draggable="false">
+
             <img class="dado" src="assets/dado.png" alt="Segundo dado de la segunda tirada" draggable="false">
+
         </div>
+
         <button class="activar-movimiento boton-control" type="button" aria-pressed="false">
+
             Activar movimiento
+
         </button>
+
         <p class="estado-movimiento estado-control" role="status">
+
             El sensor de movimiento está apagado.
+
         </p>
+
         <label>
+
             Intensidad del movimiento
+
             <meter class="nivel-sacudida medidor-control" min="0" max="1" value="0"></meter>
+
         </label>
+
         <p class="nota nota-movimiento"></p>
+
     </section>
 
     <section>
+
         <h1>Pierdes de nuevo, ahora solo tienes tres gemas.</h1>
+
         <p class = "dialogo-largo">
+
             Pero esta es la única forma de seguir adelante,
+
             decides arriesgarte una última vez.
+
         </p>
+
     </section>
 
     <!-- TERCERA SACUDIDA -->
+
     <section class="seccion-sacudida" data-dado-resultado="assets/dado4.png" data-saldo-gemas="1">
+
         <h1>Tercera tirada</h1>
+
         <p>Activa el movimiento y sacude una vez más.</p>
+
         <div class="contenedor-dados">
+
             <img class="dado" src="assets/dado.png" alt="Primer dado de la tercera tirada" draggable="false">
+
             <img class="dado" src="assets/dado.png" alt="Segundo dado de la tercera tirada" draggable="false">
+
         </div>
+
         <button class="activar-movimiento boton-control" type="button" aria-pressed="false">
+
             Activar movimiento
+
         </button>
+
         <p class="estado-movimiento estado-control" role="status">
+
             El sensor de movimiento está apagado.
+
         </p>
+
         <label>
+
             Intensidad del movimiento
+
             <meter class="nivel-sacudida medidor-control" min="0" max="1" value="0"></meter>
+
         </label>
+
         <p class="nota nota-movimiento"></p>
+
     </section>
 
     <section>
+
         <h1>¡Lo lograste por fin!</h1>
+
         <p class = "dialogo-largo">Lograste vencer al celador, pero a Charrito solo le queda una gema.</p>
+
     </section>
 
     <!-- CARTAS -->
+
     <section id="seccion-cartas">
+
         <h1>El enfrentamiento definitivo con el borracho ha llegado</h1>
+
         <p class = "dialogo-largo">
+
             Él te confronta con una revelación aterradora:
+
             bajo estas tres cartas yacen los tres posibles destinos de Charrito.
+
         </p>
+
         <div class="contenedor-imagen3">
+
             <img src="assets/borracho-malvado.png" alt="Borracho">
+
         </div>
+
         <p>
+
             Activa la cámara cubriéndola parcialmente.
+
             Cuando termine de calibrar, destápala para voltear las cartas.
+
         </p>
 
         <div class="cartas">
+
             <div class="carta">
+
                 <div class="carta-interior">
+
                     <div class="carta-cara">
+
                         <img src="assets/carta.jpg" alt="Primera carta">
+
                     </div>
+
                     <div class="carta-cara carta-reverso" aria-hidden="true">
+
                         <img src="assets/cartafinal.png" alt="">
+
                     </div>
+
                 </div>
+
             </div>
+
             <div class="carta">
+
                 <div class="carta-interior">
+
                     <div class="carta-cara">
+
                         <img src="assets/carta.jpg" alt="Segunda carta">
+
                     </div>
+
                     <div class="carta-cara carta-reverso" aria-hidden="true">
+
                         <img src="assets/cartafinal.png" alt="">
+
                     </div>
+
                 </div>
+
             </div>
+
             <div class="carta">
+
                 <div class="carta-interior">
+
                     <div class="carta-cara">
+
                         <img src="assets/carta.jpg" alt="Tercera carta">
+
                     </div>
+
                     <div class="carta-cara carta-reverso" aria-hidden="true">
+
                         <img src="assets/cartafinal.png" alt="">
+
                     </div>
+
                 </div>
+
             </div>
+
         </div>
 
         <button id="activar-camara" class="boton-control" type="button" aria-pressed="false">
+
             Activar cámara
+
         </button>
+
         <p id="estado-camara" class="estado-control" role="status">
+
             La cámara está desactivada por ahora.
+
         </p>
+
         <label for="nivel-luz">Brillo detectado</label>
+
         <meter id="nivel-luz" class="medidor-control" min="0" max="255" value="0"></meter>
+
         <p class="nota">La imagen se analiza en tu dispositivo. No se graba ni se envía.</p>
+
         <p class="nota nota-cartas"></p>
+
         <video id="video-luz" class="video-analisis" autoplay muted playsinline aria-hidden="true"></video>
+
     </section>
 
     <section>
+
         <h1>Te fijas en lo que las cartas revelaron</h1>
+
         <p class = "dialogo-largo">
+
             Charrito logró evitar la adicción, pero en su viaje, no pudo evitar
+
             que tú cayeras en ella. Ahora estás atrapado:
+
         </p>
+
         <h1>Eres un ludopata, que también es adicto al doomscrolling.</h1>
+
     </section>
 
     <dialog
+
         id="resultado-ruleta"
+
         aria-labelledby="titulo-resultado-ruleta"
+
         aria-describedby="gemas-resultado-ruleta"
+
     >
+
         <div class="panel-resultado-ruleta">
+
             <h2 id="titulo-resultado-ruleta"></h2>
+
             <div id="gemas-resultado-ruleta" class="gemas-resultado-ruleta" role="img"></div>
+
             <form method="dialog">
+
                 <button class="boton-control" type="submit" autofocus>Continuar</button>
+
             </form>
+
         </div>
+
     </dialog>
 
     <dialog id="resultado-dados" aria-labelledby="titulo-resultado-dados">
+
         <div class="panel-resultado-ruleta">
+
             <h2 id="titulo-resultado-dados">Resultado de la tirada</h2>
+
             <div id="imagenes-resultado-dados" class="imagenes-resultado-dados"></div>
+
             <audio id="audio-resultado-dados" src="./assets/dado-antes.wav" preload="auto"></audio>
+
             <button id="reproducir-resultado-dados" class="boton-control" type="button" hidden>
+
                 Reproducir sonido
+
             </button>
+
             <form method="dialog">
+
                 <button class="boton-control" type="submit" autofocus>Continuar</button>
+
             </form>
+
         </div>
+
     </dialog>
+
 </body>
+
 </html>

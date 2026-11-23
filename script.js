@@ -5,13 +5,11 @@
 
     const efectos = (() => {
         const AudioDisponible = window.AudioContext || window.webkitAudioContext;
-
         if (!AudioDisponible) {
             return { reproducir() {}, detener() {} };
         }
 
         let contexto;
-
         try {
             contexto = new AudioDisponible();
         } catch {
@@ -21,8 +19,7 @@
         const pistas = {
             dados: cargar("./assets/dados-audio.mpeg"),
             ruleta: cargar("./assets/ruleta-audio.mpeg"),
-            gemas: cargar("./assets/gemas-audio.mpeg"),
-            resultadoDados: cargar("./assets/dado-antes.wav")
+            gemas: cargar("./assets/gemas-audio.mpeg")
         };
         const reproduciendo = new Map();
 
@@ -58,7 +55,6 @@
 
             try {
                 const pista = await pistas[nombre];
-
                 if (reproduciendo.get(clave) !== turno) return;
 
                 if (!pista) {
@@ -72,7 +68,6 @@
 
                 fuente.addEventListener("ended", () => {
                     fuente.disconnect();
-
                     if (reproduciendo.get(clave) === turno) {
                         reproduciendo.delete(clave);
                     }
@@ -99,6 +94,12 @@
     })();
 
     /* FUNCIONES COMPARTIDAS */
+
+    function musicaCasino(origen, activa) {
+        document.dispatchEvent(new CustomEvent("musica-casino", {
+            detail: { origen, activa }
+        }));
+    }
 
     function restablecerDados(dados) {
         dados.forEach((dado) => {
@@ -165,11 +166,13 @@
         botonAbrir?.addEventListener("click", () => {
             if (!dialogoGiro.open && typeof dialogoGiro.showModal === "function") {
                 dialogoGiro.showModal();
+                musicaCasino(dialogoGiro, true);
             }
         });
 
         dialogoGiro?.addEventListener("close", () => {
             if (dialogoGiro.open) return;
+            musicaCasino(dialogoGiro, false);
 
             clearTimeout(temporizadorTeclado);
             temporizadorTeclado = null;
@@ -192,7 +195,6 @@
 
         function sonarRuleta() {
             if (sonidoUsado) return;
-
             sonidoUsado = true;
             efectos.reproducir("ruleta", contenedor);
         }
@@ -221,7 +223,10 @@
                 gemasResultado.append(gema);
             }
 
-            if (dialogoGiro?.open) dialogoGiro.close();
+            if (dialogoGiro?.open) {
+                musicaCasino(dialogoGiro, false);
+                dialogoGiro.close();
+            }
             dialogoRuleta.showModal();
             resultadoMostrado = true;
             efectos.reproducir("gemas", resultado);
@@ -245,7 +250,6 @@
         function obtenerAngulo(evento) {
             const x = evento.clientX - centroX;
             const y = evento.clientY - centroY;
-
             if (Math.hypot(x, y) < 20) return null;
             return Math.atan2(y, x) * 180 / Math.PI;
         }
@@ -311,7 +315,6 @@
             function continuarGiro(ahora) {
                 const tiempo = Math.max(0, Math.min(ahora - ultimoFrame, 32));
                 ultimoFrame = ahora;
-
                 rotacion += velocidad * tiempo;
                 velocidad *= Math.pow(0.95, tiempo / 16.67);
                 dibujar();
@@ -345,11 +348,7 @@
             }
 
             const giroValido = giroAcumulado >= giroMinimo;
-
-            if (
-                preferenciaMovimiento.matches ||
-                performance.now() - ultimoMovimiento > 100
-            ) {
+            if (preferenciaMovimiento.matches || performance.now() - ultimoMovimiento > 100) {
                 velocidad = 0;
             }
 
@@ -435,6 +434,7 @@
         let intensidad = 0;
 
         function detener(mensaje = "El micrófono está apagado.") {
+            musicaCasino(boton, false);
             version += 1;
             activo = false;
             iniciando = false;
@@ -504,7 +504,6 @@
             }
 
             const AudioDisponible = window.AudioContext || window.webkitAudioContext;
-
             if (!AudioDisponible) {
                 estado.textContent = "Este navegador no permite analizar el audio.";
                 return;
@@ -514,6 +513,7 @@
             iniciando = true;
             boton.textContent = "Cancelar activación";
             estado.textContent = "Permite el acceso al micrófono…";
+            musicaCasino(boton, true);
 
             try {
                 const contexto = new AudioDisponible();
@@ -524,7 +524,7 @@
 
                 const nuevoFlujo = await navigator.mediaDevices.getUserMedia({
                     audio: {
-                        echoCancellation: false,
+                        echoCancellation: true,
                         noiseSuppression: false,
                         autoGainControl: false
                     },
@@ -546,9 +546,9 @@
 
                 activo = true;
                 iniciando = false;
-
                 boton.textContent = "Apagar micrófono";
                 boton.setAttribute("aria-pressed", "true");
+
                 estado.textContent = preferenciaMovimiento.matches
                     ? "Micrófono activo. Movimiento reducido activado: observa la barra."
                     : "Micrófono activo. ¡Sopla para mover los dados!";
@@ -585,6 +585,14 @@
             if (document.hidden && (activo || iniciando)) detener();
         });
 
+        const seccion = boton.closest("section");
+        if (seccion && "IntersectionObserver" in window) {
+            const observador = new IntersectionObserver(([entrada]) => {
+                if (!entrada.isIntersecting && (activo || iniciando)) detener();
+            });
+            observador.observe(seccion);
+        }
+
         window.addEventListener("pagehide", () => detener());
     })();
 
@@ -595,7 +603,23 @@
         const pausaParaMostrarResultado = 700;
         const dialogoDados = document.getElementById("resultado-dados");
         const imagenesResultado = document.getElementById("imagenes-resultado-dados");
+        const audioResultado = document.getElementById("audio-resultado-dados");
+        const botonAudioResultado = document.getElementById("reproducir-resultado-dados");
         let detenerActual = null;
+
+        async function sonarResultadoDados() {
+            if (!audioResultado || !botonAudioResultado) return;
+
+            botonAudioResultado.hidden = true;
+            try {
+                audioResultado.currentTime = 0;
+                await audioResultado.play();
+            } catch {
+                botonAudioResultado.hidden = false;
+            }
+        }
+
+        botonAudioResultado?.addEventListener("click", sonarResultadoDados);
 
         document.querySelectorAll(".seccion-sacudida").forEach((seccion) => {
             const boton = seccion.querySelector(".activar-movimiento");
@@ -639,6 +663,7 @@
             });
 
             function detener(mensaje = "El sensor de movimiento está apagado.") {
+                musicaCasino(seccion, false);
                 version += 1;
                 activo = false;
                 iniciando = false;
@@ -680,7 +705,6 @@
 
             function detectar(evento) {
                 if (!activo) return;
-
                 if (!estaVisible(seccion)) {
                     detener();
                     return;
@@ -770,13 +794,13 @@
                     }
 
                     imagen.alt = "Primer dado del resultado";
-
                     const segundaImagen = imagen.cloneNode();
                     segundaImagen.alt = "Segundo dado del resultado";
 
                     imagenesResultado.replaceChildren(imagen, segundaImagen);
                     dialogoDados.showModal();
-                    efectos.reproducir("resultadoDados", imagen);
+                    musicaCasino(seccion, false);
+                    sonarResultadoDados();
 
                     resultadoMostrado = true;
                     ultimaSacudida = null;
@@ -797,16 +821,12 @@
 
             function animar(ahora) {
                 if (!activo) return;
-
                 if (!estaVisible(seccion)) {
                     detener();
                     return;
                 }
 
-                const tiempo = ultimoFrame === null
-                    ? 16.67
-                    : Math.min(ahora - ultimoFrame, 50);
-
+                const tiempo = ultimoFrame === null ? 16.67 : Math.min(ahora - ultimoFrame, 50);
                 ultimoFrame = ahora;
                 medidor.value = intensidad;
                 moverDados(dados, intensidad, ahora, 20);
@@ -845,7 +865,6 @@
                 }
 
                 const Sensor = window.DeviceMotionEvent;
-
                 if (!Sensor) {
                     estado.textContent = "Este navegador no ofrece acceso al sensor.";
                     return;
@@ -858,6 +877,7 @@
                 iniciando = true;
                 boton.textContent = "Cancelar activación";
                 estado.textContent = "Activando el sensor…";
+                musicaCasino(seccion, true);
 
                 temporizador = setTimeout(() => {
                     if (solicitud === version && !datosRecibidos) {
@@ -972,15 +992,12 @@
                 const { elemento, texto, letras, visible, pendiente } = dialogos[indice];
                 inicio ??= ahora;
 
-                const cantidad = 1 + Math.floor(
-                    (ahora - inicio) / milisegundosPorLetra
-                );
+                const cantidad = 1 + Math.floor((ahora - inicio) / milisegundosPorLetra);
 
                 if (cantidad >= letras.length) {
                     elemento.textContent = texto;
                     indice += 1;
                     if (indice === dialogos.length) return;
-
                     inicio = undefined;
                 } else {
                     visible.data = letras.slice(0, cantidad).join("");
@@ -1058,55 +1075,80 @@
         return;
     }
 
-    const volumen = contexto.createGain();
-    volumen.gain.value = 0.25;
-    volumen.connect(contexto.destination);
+    const volumenFondo = contexto.createGain();
+    const volumenCasino = contexto.createGain();
+    volumenFondo.connect(contexto.destination);
+    volumenCasino.connect(contexto.destination);
 
-    function actualizarBoton() {
-        boton.textContent = contexto.state === "running"
+    let fondoActivado = false;
+    let musicaPausada = false;
+    let casinoListo = false;
+    const interacciones = new Set();
+
+    function actualizarMusica() {
+        const casinoActivo = casinoListo && interacciones.size > 0;
+        const audible = !musicaPausada && (casinoActivo || fondoActivado);
+        volumenFondo.gain.value = audible && !casinoActivo ? 0.25 : 0;
+        volumenCasino.gain.value = audible && casinoActivo ? 0.15 : 0;
+        boton.textContent = audible && contexto.state === "running"
             ? "Pausar música"
             : "Activar música";
     }
 
-    contexto.addEventListener("statechange", actualizarBoton);
-
-    boton.addEventListener("click", async () => {
-        try {
-            if (contexto.state === "running") {
-                await contexto.suspend();
-            } else {
-                await contexto.resume();
-            }
-
-            actualizarBoton();
-        } catch {
-            mostrarEstado("No se pudo cambiar la reproducción de la música.");
-        }
-    });
-
-    async function prepararBucle() {
-        mostrarEstado("Cargando música…");
-
-        try {
-            const respuesta = await fetch("./assets/loop%20final%20v2.wav");
-            if (!respuesta.ok) throw new Error("No se encontró el WAV.");
-
-            const datos = await respuesta.arrayBuffer();
-            const pista = await contexto.decodeAudioData(datos);
-
-            const fuente = contexto.createBufferSource();
-            fuente.buffer = pista;
-            fuente.loop = true;
-            fuente.connect(volumen);
-            fuente.start();
-
-            mostrarEstado("");
-        } catch {
-            boton.disabled = true;
-            mostrarEstado("No se pudo cargar loop final v2.wav.");
-        }
+    function iniciarMusica() {
+        contexto.resume().catch(() => {
+            mostrarEstado("No se pudo iniciar la música.");
+        });
     }
 
-    actualizarBoton();
-    prepararBucle();
+    contexto.addEventListener("statechange", actualizarMusica);
+
+    document.addEventListener("musica-casino", ({ detail: { origen, activa } }) => {
+        if (activa) {
+            interacciones.add(origen);
+            if (!musicaPausada) iniciarMusica();
+        } else {
+            interacciones.delete(origen);
+        }
+        actualizarMusica();
+    });
+
+    window.addEventListener("pagehide", () => {
+        interacciones.clear();
+        actualizarMusica();
+    });
+
+    boton.addEventListener("click", () => {
+        if (boton.textContent === "Pausar música") {
+            musicaPausada = true;
+        } else {
+            musicaPausada = false;
+            fondoActivado = true;
+            iniciarMusica();
+        }
+        actualizarMusica();
+    });
+
+    async function prepararBucle(ruta, volumen) {
+        const respuesta = await fetch(ruta);
+        if (!respuesta.ok) throw new Error(`HTTP ${respuesta.status}`);
+
+        const datos = await respuesta.arrayBuffer();
+        const fuente = contexto.createBufferSource();
+        fuente.buffer = await contexto.decodeAudioData(datos);
+        fuente.loop = true;
+        fuente.connect(volumen);
+        fuente.start();
+    }
+
+    actualizarMusica();
+    prepararBucle("./assets/loop%20final%20v2.wav", volumenFondo).catch(() => {
+        mostrarEstado("No se pudo cargar loop final v2.wav.");
+    });
+    prepararBucle("./assets/loop-casino.wav", volumenCasino).then(() => {
+        casinoListo = true;
+        actualizarMusica();
+    }).catch((error) => {
+        console.warn("No se pudo cargar assets/loop-casino.wav.", error);
+    });
 })();
