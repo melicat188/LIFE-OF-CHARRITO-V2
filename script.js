@@ -1932,7 +1932,15 @@
 
         }
 
-        contexto.resume().catch(() => {
+        contexto.resume().then(() => {
+
+            for (const gesto of gestosDeInicio) {
+
+                document.removeEventListener(gesto, iniciarConGesto);
+
+            }
+
+        }).catch(() => {
 
             mostrarEstado("No se pudo iniciar la música.");
 
@@ -1942,11 +1950,29 @@
 
     contexto.addEventListener("statechange", actualizarMusica);
 
-    document.addEventListener("click", (evento) => {
+    const gestosDeInicio = ["pointerup", "touchend", "click", "keydown"];
+
+    function iniciarConGesto(evento) {
 
         if (!boton.contains(evento.target) && !musicaPausada) iniciarMusica();
 
-    }, { once: true });
+    }
+
+    for (const gesto of gestosDeInicio) {
+
+        document.addEventListener(gesto, iniciarConGesto);
+
+    }
+
+    contexto.resume().then(() => {
+
+        if (!musicaPausada) iniciarMusica();
+
+    }).catch(() => {
+
+        // Si el navegador exige un gesto, la música arranca al tocar el juego.
+
+    });
 
     document.addEventListener("musica-casino", ({ detail: { origen, activa } }) => {
 
