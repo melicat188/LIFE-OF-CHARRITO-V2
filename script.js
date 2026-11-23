@@ -1089,7 +1089,7 @@
         const casinoActivo = casinoListo && interacciones.size > 0;
         const audible = !musicaPausada && (casinoActivo || fondoActivado);
         volumenFondo.gain.value = audible && !casinoActivo ? 0.25 : 0;
-        volumenCasino.gain.value = audible && casinoActivo ? 0.15 : 0;
+        volumenCasino.gain.value = audible && casinoActivo ? 0.30 : 0;
         boton.textContent = audible && contexto.state === "running"
             ? "Pausar música"
             : "Activar música";
