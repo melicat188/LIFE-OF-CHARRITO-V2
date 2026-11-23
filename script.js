@@ -822,7 +822,12 @@
 
             const volumen = Math.sqrt(suma / datos.length);
 
-            const objetivo = Math.max(0, Math.min(1, (volumen - 0.025) / (0.18 - 0.025)));
+          const umbralRuido = 0.015;
+const nivelMaximo = 0.12;
+const objetivo = Math.max(
+    0,
+    Math.min(1, (volumen - umbralRuido) / (nivelMaximo - umbralRuido))
+);
 
             intensidad += (objetivo - intensidad) * 0.18;
 
