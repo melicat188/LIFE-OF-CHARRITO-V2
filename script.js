@@ -833,7 +833,7 @@ const objetivo = Math.max(
 
             medidor.value = intensidad;
 
-            moverDados(dados, intensidad, ahora, 4);
+            moverDados(dados, intensidad, ahora, 16);
 
             // Exige un soplido sostenido y espera a que el sonido baje.
 
@@ -851,7 +851,7 @@ const objetivo = Math.max(
 
                 inicioSoplido = null;
 
-                if (ultimoSoplido !== null && ahora - ultimoSoplido >= 450) {
+                if (ultimoSoplido !== null && ahora - ultimoSoplido >= 1000) {
 
                     detener("¡Soplido completado!");
 
