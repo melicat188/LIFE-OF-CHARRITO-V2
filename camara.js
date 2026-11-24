@@ -346,8 +346,8 @@
 
             iniciando = true;
 
-            boton.textContent = "Cancelar activación";
-
+            boton.textContent = "Apagar cámara";
+            
             document.dispatchEvent(new CustomEvent("musica-casino", {
 
                 detail: { origen: boton, activa: true }
@@ -421,8 +421,6 @@
                 activo = true;
 
                 iniciando = false;
-
-                boton.textContent = "Apagar cámara";
 
                 boton.setAttribute("aria-pressed", "true");
 
