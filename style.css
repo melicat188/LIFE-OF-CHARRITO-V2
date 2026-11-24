@@ -482,3 +482,8 @@ p {
 .carta-reverso img {
     transform: translate(3.4%, -5%) scale(1.72);
 }
+
+.dialogo-giro-ruleta form[method="dialog"] {
+    position: relative;
+    z-index: 1;
+}
