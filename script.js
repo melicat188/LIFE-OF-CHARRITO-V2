@@ -772,6 +772,8 @@
 
         function detener(mensaje = "El micrófono está apagado.") {
 
+            const habiaMicrofono = activo || iniciando;
+
             version += 1;
 
             activo = false;
@@ -837,6 +839,8 @@
             boton.setAttribute("aria-pressed", "false");
 
             estado.textContent = mensaje;
+
+            if (habiaMicrofono) document.dispatchEvent(new Event("sesion-microfono-cambiada"));
 
         }
 
@@ -999,6 +1003,8 @@
                 }
 
                 flujo = nuevoFlujo;
+
+                document.dispatchEvent(new Event("sesion-microfono-cambiada"));
 
                 await reanudacion;
 
@@ -1968,6 +1974,22 @@
 
     });
 
+    document.addEventListener("sesion-microfono-cambiada", () => {
+
+        if (!pistasSolicitadas || musicaPausada || document.hidden ||
+
+            contexto.state === "running") return;
+
+        for (const gesto of gestosDeInicio) {
+
+            document.addEventListener(gesto, iniciarConGesto);
+
+        }
+
+        iniciarMusica();
+
+    });
+
     document.addEventListener("musica-casino", ({ detail: { origen, activa } }) => {
 
         if (activa) {
@@ -2035,3 +2057,4 @@
     actualizarMusica();
 
 })();
+
